@@ -2,7 +2,7 @@
 Starter application for CMP301 coursework
 Updated for 2020
 
-Name:
+Name: Hamish Hill
 
-Number:
+Number: 2002431
 
