@@ -13,7 +13,16 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	BaseApplication::init(hinstance, hwnd, screenWidth, screenHeight, in, VSYNC, FULL_SCREEN);
 
 	// Initalise scene variables.
-	
+	textureMgr->loadTexture(L"brick", L"res/brick1.dds");
+	//textureMgr->loadTexture(L"height", L"res/height.png");
+	textureMgr->loadTexture(L"myHeightMap", L"res/myHeightMap.png");
+
+	ground = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
+	groundShader = new verManipShader(renderer->getDevice(), hwnd);
+
+	skylight = new Light();
+	skylight->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
+	skylight->setDirection(0.7f, -0.7f, 0.0f);
 
 }
 
@@ -24,7 +33,17 @@ App1::~App1()
 	BaseApplication::~BaseApplication();
 
 	// Release the Direct3D object.
-	
+	if (ground)
+	{
+		delete ground;
+		ground = 0;
+	}
+
+	if (groundShader)
+	{
+		delete groundShader;
+		groundShader = 0;
+	}
 }
 
 
@@ -61,7 +80,10 @@ bool App1::render()
 	XMMATRIX viewMatrix = camera->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
-	
+	ground->sendData(renderer->getDeviceContext());
+	groundShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"myHeightMap"), skylight);
+	groundShader->render(renderer->getDeviceContext(), ground->getIndexCount());
+
 
 	// Render GUI
 	gui();

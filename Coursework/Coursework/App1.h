@@ -4,6 +4,7 @@
 
 // Includes
 #include "DXF.h"
+#include "verManipShader.h"
 
 
 class App1 : public BaseApplication
@@ -21,7 +22,10 @@ protected:
 	void gui();
 
 private:
+	verManipShader* groundShader;
+	PlaneMesh* ground;
 
+	Light* skylight;
 };
 
 #endif
