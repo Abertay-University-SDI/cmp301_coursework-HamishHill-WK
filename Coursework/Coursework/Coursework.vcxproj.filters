@@ -24,6 +24,9 @@
     <ClCompile Include="verManipShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="texShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App1.h">
@@ -32,12 +35,21 @@
     <ClInclude Include="verManipShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="texShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="verManipPS.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
     <FxCompile Include="verManipVS.hlsl">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="texShaderPS.hlsl">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="texShaderVS.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
   </ItemGroup>

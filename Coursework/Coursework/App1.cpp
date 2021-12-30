@@ -16,9 +16,14 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	textureMgr->loadTexture(L"brick", L"res/brick1.dds");
 	//textureMgr->loadTexture(L"height", L"res/height.png");
 	textureMgr->loadTexture(L"myHeightMap", L"res/myHeightMap.png");
+	textureMgr->loadTexture(L"snowTexture", L"res/snowTexture.png");
+	textureMgr->loadTexture(L"treeTex2", L"res/treeTex2.png");
+
+	model = new AModel(renderer->getDevice(), "res/por_tree.obj");
 
 	ground = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
 	groundShader = new verManipShader(renderer->getDevice(), hwnd);
+	textureShader = new texShader(renderer->getDevice(), hwnd);
 
 	skylight = new Light();
 	skylight->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
@@ -80,9 +85,20 @@ bool App1::render()
 	XMMATRIX viewMatrix = camera->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
+	//XMMATRIX scaleMatrix = XMMatrixScaling(0.75f, 0.75f, 0.75f);
+//	worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix);
+
 	ground->sendData(renderer->getDeviceContext());
-	groundShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"myHeightMap"), skylight);
+	groundShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"myHeightMap"), textureMgr->getTexture(L"snowTexture"), skylight);
 	groundShader->render(renderer->getDeviceContext(), ground->getIndexCount());
+
+	// Render model
+	worldMatrix = XMMatrixTranslation(50.f, 10.f, 50.f);
+	XMMATRIX scaleMatrix = XMMatrixScaling(0.5f, 0.5f, 0.5f);
+	worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix);
+	model->sendData(renderer->getDeviceContext());
+	textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), skylight);
+	textureShader->render(renderer->getDeviceContext(), model->getIndexCount());
 
 
 	// Render GUI
