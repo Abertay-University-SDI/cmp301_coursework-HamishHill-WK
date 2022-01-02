@@ -45,7 +45,7 @@ void verManipShader::initShader(const wchar_t* vsFilename, const wchar_t* psFile
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	D3D11_SAMPLER_DESC samplerDesc;
 	D3D11_BUFFER_DESC lightBufferDesc;
-	D3D11_BUFFER_DESC timeBufferDesc;
+	//D3D11_BUFFER_DESC timeBufferDesc;
 
 	// Load (+ compile) shader files
 	loadVertexShader(vsFilename);
@@ -108,7 +108,7 @@ void verManipShader::initShader(const wchar_t* vsFilename, const wchar_t* psFile
 }
 
 
-void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* heightTex, ID3D11ShaderResourceView* texture, Light* light)
+void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* heightTex, ID3D11ShaderResourceView* texture, Light* skylight, myLight* spotlight) 
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -129,6 +129,9 @@ void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, con
 	deviceContext->Unmap(matrixBuffer, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, &matrixBuffer);
 
+	deviceContext->VSSetShaderResources(0, 1, &heightTex);
+	deviceContext->VSSetSamplers(0, 1, &sampleState);
+
 	//TimeBufferType* timePtr;
 	//deviceContext->Map(timeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	//timePtr = (TimeBufferType*)mappedResource.pData;
@@ -142,18 +145,20 @@ void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, con
 	LightBufferType* lightPtr;
 	deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	lightPtr = (LightBufferType*)mappedResource.pData;
-	lightPtr->diffuse = light->getDiffuseColour();
-	lightPtr->direction = light->getDirection();
-	lightPtr->padding = 0.0f;
+
+	lightPtr->diffuse = spotlight->getDiffuseColour();
+	lightPtr->ambient = spotlight->getAmbientColour();
+	lightPtr->direction = spotlight->getDirection();
+	lightPtr->type = spotlight->getType();
+	lightPtr->position = spotlight->getPosition();
+	lightPtr->atten = spotlight->getAtten();
+	lightPtr->pad = 0.0f;
+
 	deviceContext->Unmap(lightBuffer, 0);
 	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);
 
-
-
-	// Set shader texture resource in the pixel shader.
+	 //Set shader texture resource in the pixel shader.
 	deviceContext->PSSetShaderResources(0, 1, &texture);
-	deviceContext->PSSetSamplers(0, 1, &sampleState1);	
-	
-	deviceContext->VSSetShaderResources(0, 1, &heightTex);
-	deviceContext->VSSetSamplers(0, 1, &sampleState);
+	deviceContext->PSSetSamplers(0, 1, &sampleState);	
+
 }

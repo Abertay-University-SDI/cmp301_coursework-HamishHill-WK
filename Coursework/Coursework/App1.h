@@ -6,7 +6,8 @@
 #include "DXF.h"
 #include "verManipShader.h"
 #include "texShader.h"
-
+#include "LightShader.h"
+#include "myLight.h"
 
 class App1 : public BaseApplication
 {
@@ -22,13 +23,24 @@ protected:
 	bool render();
 	void gui();
 
+	float pos[3];
+
+	void firstRender();
+	void scndRender();
+
 private:
 	verManipShader* groundShader;
 	texShader* textureShader;
+	LightShader* lightShader;
+
 	PlaneMesh* ground;
 	AModel* model;
 
-	Light* skylight;
+	myLight* skylight;
+	myLight* spotlight;
+
+	OrthoMesh* orthomesh;
+	RenderTexture* renderTexture;
 };
 
 #endif

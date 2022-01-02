@@ -22,6 +22,7 @@ struct OutputType
 	float4 position : SV_POSITION;
 	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
+    float3 worldPosition : TEXCOORD1;
 };
 
 float heightMap(float2 uv)
@@ -40,7 +41,8 @@ OutputType main(InputType input)
 
 	//input.normal = float3(padding.x * (-cos((padding.y * input.position.x) + (time * padding.z))), 1, 0);// +float3(padding.x * (-cos((padding.y * input.position.z) + (time * padding.z))), 1, 0);
 
-	input.position.y += heightMap(input.tex) * 10;
+    input.position.y += heightMap(input.tex) * 40;
+
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
 	output.position = mul(input.position, worldMatrix);
@@ -51,8 +53,9 @@ OutputType main(InputType input)
 	output.tex = input.tex;
 
 	// Calculate the normal vector against the world matrix only and normalise.
-	output.normal = mul(input.normal, (float3x3)worldMatrix);
-	output.normal = normalize(output.normal);
+		
+    output.normal = mul(input.normal, (float3x3) worldMatrix);
+    output.normal = normalize(output.normal);
 
 	return output;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DXF.h"
+#include "myLight.h"
 
 using namespace std;
 using namespace DirectX;
@@ -10,16 +11,21 @@ class verManipShader : public BaseShader
 private:
 	struct LightBufferType
 	{
-		XMFLOAT4 diffuse;
 		XMFLOAT3 direction;
-		float padding;
+		float pad;
+		XMFLOAT4 ambient;
+		XMFLOAT4 diffuse;
+		XMFLOAT3 position;
+		int type;
+		XMFLOAT3 atten;
+		float pad1;
 	};
 
 public:
 	verManipShader(ID3D11Device* device, HWND hwnd);
 	~verManipShader();
 
-	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightTex, ID3D11ShaderResourceView* texture, Light* light);
+	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightTex, ID3D11ShaderResourceView* texture, Light* light, myLight* spotlight);
 
 private:
 	void initShader(const wchar_t* cs, const wchar_t* ps);

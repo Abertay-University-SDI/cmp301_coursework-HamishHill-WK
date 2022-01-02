@@ -56,12 +56,12 @@ void texShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilename)
 
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-	//samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	//samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	//samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;	
+	//samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	//samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	//samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;	
 	//samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
 	//samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
 	//samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
@@ -77,7 +77,7 @@ void texShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilename)
 }
 
 
-void texShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* texture, Light* light)
+void texShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* texture)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
