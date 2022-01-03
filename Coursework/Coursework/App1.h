@@ -23,7 +23,8 @@ protected:
 	bool render();
 	void gui();
 
-	float pos[3];
+	XMFLOAT3 pos;
+	XMFLOAT3 direction;
 	bool renderSphere;
 
 	void firstRender();
@@ -35,7 +36,7 @@ private:
 	LightShader* lightShader;
 
 	PlaneMesh* ground;
-	AModel* model;
+	AModel* model[4];
 
 	SphereMesh* pointLightSphere;
 

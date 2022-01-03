@@ -137,7 +137,7 @@ void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const 
 	lightPtr->pad1 = 0.0f;
 	lightPtr->atten = light->getAtten();
 
-	lightPtr->type = light->getType();
+	//lightPtr->type = light->getType();
 
 
 

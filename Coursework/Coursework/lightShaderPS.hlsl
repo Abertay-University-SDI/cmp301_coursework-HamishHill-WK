@@ -44,7 +44,7 @@ float4 main(InputType input) : SV_TARGET
         float4 textureColour;
         float4 lightColour;
 
-    textureColour = texture0.Sample(sampler0, (input.tex * 2));
+    textureColour = texture0.Sample(sampler0, (input.tex));
 
         
     //switch (type)

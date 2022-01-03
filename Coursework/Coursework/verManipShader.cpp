@@ -141,12 +141,12 @@ void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, con
 	deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	lightPtr = (LightBufferType*)mappedResource.pData;
 
-	//lightPtr->direction[0] = skylight->getDirection();
+	lightPtr->direction = skylight->getDirection();
 //	lightPtr->direction[1] = pointlight->getDirection();
 //	lightPtr->pad = XMFLOAT2(0.0f, 0.0f);
 	lightPtr->ambient = pointlight->getAmbientColour();
-	//lightPtr->diffuse[0] = skylight->getDiffuseColour();
-	lightPtr->diffuse = pointlight->getDiffuseColour();
+	lightPtr->diffuse[0] = skylight->getDiffuseColour();
+	lightPtr->diffuse[1] = pointlight->getDiffuseColour();
 //	lightPtr->diffuse = XMFLOAT4(0, 0, 0, 0);
 //	lightPtr->position[0] = XMFLOAT3(0, 0, 0);
 	lightPtr->position = pointlight->getPosition();

@@ -20,7 +20,9 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	textureMgr->loadTexture(L"snowTexture", L"res/snowTexture.png");
 	textureMgr->loadTexture(L"treeTex2", L"res/treeTex2.png");
 
-	model = new AModel(renderer->getDevice(), "res/por_tree.obj");
+	for(int i = 0; i < 4; i++)
+	model[i] = new AModel(renderer->getDevice(), "res/por_tree.obj");
+
 	ground = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
 	pointLightSphere = new SphereMesh(renderer->getDevice(), renderer->getDeviceContext());
 
@@ -35,20 +37,24 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 
 	skylight = new myLight();
 	//skylight->setType(0);
-	skylight->setDiffuseColour(0.0f, 0.0f, 0.2f, 0.2f);
+	skylight->setDiffuseColour(0.0f, 0.35f, 0.6f, 0.2f);
 //	skylight->setAmbientColour(0.0f, 0.0f, 0.1f, 0.1f);
 	skylight->setDirection(0.7f, -0.7f, 0.0f);
 
 	pointlight = new myLight();
 	//pointlight->setType(2);
-	pointlight->setAmbientColour(0.2f, 0.0f, 0.0f, 0.5f);
-	pointlight->setDiffuseColour(1.0f, 0.5f, 0.0f, 1.0f);
+	pointlight->setAmbientColour(0.1f, 0.1f, 0.0f, 0.1f);
+	pointlight->setDiffuseColour(1.0f, 0.75f, 0.0f, 1.0f);
 	pointlight->setPosition(25.0f, 10.0f, 25.0f);
 	pointlight->setAtten(0.5f, 0.25f, 0.0f);
 
-	pos[0] = 50.0f;
-	pos[1] = 11.0f;
-	pos[2] = 50.0f;
+	pos.x = 50.0f;
+	pos.y = 11.0f;
+	pos.z = 50.0f;
+
+	direction.x = 0.5;
+	direction.y = -0.7;
+	direction.z = 0.0f;
 }
 
 
@@ -88,11 +94,11 @@ App1::~App1()
 		pointlight = 0;
 	}
 
-	if (model)
-	{
-		delete model;
-		model = 0;
-	}
+	//if (model[4])
+	//{
+	//	delete model[4];
+	//	model[4] = 0;
+	//}
 
 	if (textureShader)
 	{
@@ -136,7 +142,8 @@ bool App1::frame()
 
 bool App1::render()
 {
-	pointlight->setPosition(pos[0], pos[1], pos[2]);
+	pointlight->setPosition(pos.x, pos.y, pos.z);
+	skylight->setDirection(direction.x, direction.y, direction.z);
 
 	// Clear the scene. (default blue colour)
 	firstRender();
@@ -171,10 +178,31 @@ void App1::firstRender()
 
 	// Render model
 	XMMATRIX scaleMatrix = XMMatrixScaling(0.5f, 0.5f, 0.5f);
-	//worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix);
-	model->sendData(renderer->getDeviceContext());
+	worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix);
+
+	worldMatrix = XMMatrixTranslation(30, 5, 30);
+	model[0]->sendData(renderer->getDeviceContext());
 	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight);
-	lightShader->render(renderer->getDeviceContext(), model->getIndexCount());
+	lightShader->render(renderer->getDeviceContext(), model[0]->getIndexCount());
+	worldMatrix = XMMatrixTranslation(-30, 0, -30);
+
+	worldMatrix = XMMatrixTranslation(45, 0, 30);
+	model[1]->sendData(renderer->getDeviceContext());
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight);
+	lightShader->render(renderer->getDeviceContext(), model[1]->getIndexCount());
+	worldMatrix = XMMatrixTranslation(-45, 0, -30);
+
+	worldMatrix = XMMatrixTranslation(30, 0, 45);
+	model[0]->sendData(renderer->getDeviceContext());
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight);
+	lightShader->render(renderer->getDeviceContext(), model[2]->getIndexCount());
+	worldMatrix = XMMatrixTranslation(-30, 0, -45);
+
+	worldMatrix = XMMatrixTranslation(60, 0, 60);
+	model[3]->sendData(renderer->getDeviceContext());
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight);
+	lightShader->render(renderer->getDeviceContext(), model[3]->getIndexCount());
+	worldMatrix = XMMatrixTranslation(-60, -5, -60);
 
 	XMMATRIX scaleMatrix1 = XMMatrixScaling(2.0f, 2.0f, 2.0f);
 	worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix1);
@@ -256,9 +284,13 @@ void App1::gui()
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
 	ImGui::Checkbox("Show Light Sources", &renderSphere);
 
-	ImGui::SliderFloat("x pos", &pos[0], 1.0f, 100.0f);
-	ImGui::SliderFloat("y pos", &pos[1], 1.0f, 100.0f);
-	ImGui::SliderFloat("z pos", &pos[2], 1.0f, 100.0f);
+	ImGui::SliderFloat("x pos", &pos.x, 1.0f, 100.0f);
+	ImGui::SliderFloat("y pos", &pos.y, 1.0f, 100.0f);
+	ImGui::SliderFloat("z pos", &pos.z, 1.0f, 100.0f);	
+	
+	ImGui::SliderFloat("Direction x", &direction.x, -1.0f, 1.0f);
+	ImGui::SliderFloat("Direction y", &direction.y, -1.0f, 1.0f);
+	ImGui::SliderFloat("Direction z", &direction.z, -1.0f, 1.0f);
 
 	// Render UI
 	ImGui::Render();

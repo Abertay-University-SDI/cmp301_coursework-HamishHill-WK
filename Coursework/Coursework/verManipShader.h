@@ -11,23 +11,23 @@ class verManipShader : public BaseShader
 private:
 	struct LightBufferType
 	{
-		XMFLOAT3 direction;
+/*		XMFLOAT3 direction;
 		float pad;
 		XMFLOAT4 ambient;
 		XMFLOAT4 diffuse;
 		XMFLOAT3 position;
 		float pad1;
 		XMFLOAT3 atten;
-		float pad2;		
+		float pad2;	*/	
 		
-		//XMFLOAT3 direction[2];
-		//XMFLOAT2 pad;
-		//XMFLOAT4 ambient;
-		//XMFLOAT4 diffuse[3];
-		//XMFLOAT3 position[2];
-		//XMFLOAT2 pad1;
-		//XMFLOAT3 atten;
-		//float pad2;
+		XMFLOAT3 direction;
+		float pad;
+		XMFLOAT4 ambient;
+		XMFLOAT4 diffuse[2];
+		XMFLOAT3 position;
+		float pad1;
+		XMFLOAT3 atten;
+		float pad2;
 	};
 
 public:

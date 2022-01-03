@@ -4,23 +4,23 @@ SamplerState sampler0 : register(s0);
 
 cbuffer LightBuffer : register(b0)
 {
+    //float3 lightDirection;
+    //float pad;
+    //float4 ambient;
+    //float4 diffuseColour;
+    //float3 position;
+    //float pad1;
+    //float3 atten;
+    //float pad2;    
+    
     float3 lightDirection;
     float pad;
     float4 ambient;
-    float4 diffuseColour;
+    float4 diffuseColour[2];
     float3 position;
     float pad1;
     float3 atten;
-    float pad2;    
-    
-    //float3 lightDirection[2];
-    //float2 pad;
-    //float4 ambient;
-    //float4 diffuseColour[3];
-    //float3 position[2];
-    //float2 pad1;
-    //float3 atten;
-    //float pad2;
+    float pad2;
 };
 
 struct InputType
@@ -77,8 +77,8 @@ float4 main(InputType input) : SV_TARGET
   //  finalDif = /*(ambient + calculateLighting(-lightDirection[0], input.normal, diffuseColour[0])) +*/
   //  (calculateLighting(lightVector, input.normal, diffuseColour[1]) * attenMod);    
     
-    finalDif = /*(ambient + calculateLighting(-lightDirection[0], input.normal, diffuseColour[0])) +*/
-    (calculateLighting(lightVector, input.normal, diffuseColour) * attenMod);
+    finalDif = calculateLighting(-lightDirection, input.normal, diffuseColour[0]) +
+    (calculateLighting(lightVector, input.normal, diffuseColour[1]) * attenMod) + ambient;
            
        // lightColour[2] = (ambient[1] + finalDif);
 
@@ -96,6 +96,6 @@ float4 main(InputType input) : SV_TARGET
     
     //finalColour = (lightColour[0] + lightColour[2]);
     
-    return (finalDif + textureColour);
+    return (finalDif * textureColour);
 }
 
