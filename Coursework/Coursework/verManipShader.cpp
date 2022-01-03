@@ -70,29 +70,32 @@ void verManipShader::initShader(const wchar_t* vsFilename, const wchar_t* psFile
 
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;	
-	samplerDesc.MipLODBias = 0.0f;
-	samplerDesc.MaxAnisotropy = 1;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-	samplerDesc.MinLOD = 0;
-	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	renderer->CreateSamplerState(&samplerDesc, &sampleState);
+	//samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	//samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	//samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;	
 
-	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	/*	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;*/
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
+samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
+samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
+
 	samplerDesc.MipLODBias = 0.0f;
 	samplerDesc.MaxAnisotropy = 1;
 	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 	samplerDesc.MinLOD = 0;
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	renderer->CreateSamplerState(&samplerDesc, &sampleState1);
+
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	renderer->CreateSamplerState(&samplerDesc, &sampleState);
 
 	// Setup light buffer
 	// Setup the description of the light dynamic constant buffer that is in the pixel shader.
@@ -108,7 +111,7 @@ void verManipShader::initShader(const wchar_t* vsFilename, const wchar_t* psFile
 }
 
 
-void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* heightTex, ID3D11ShaderResourceView* texture, Light* skylight, myLight* spotlight) 
+void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* heightTex, ID3D11ShaderResourceView* texture, myLight* skylight, myLight* pointlight) 
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -130,15 +133,7 @@ void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, con
 	deviceContext->VSSetConstantBuffers(0, 1, &matrixBuffer);
 
 	deviceContext->VSSetShaderResources(0, 1, &heightTex);
-	deviceContext->VSSetSamplers(0, 1, &sampleState);
-
-	//TimeBufferType* timePtr;
-	//deviceContext->Map(timeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	//timePtr = (TimeBufferType*)mappedResource.pData;
-	//timePtr->time = currentTime;
-	//timePtr->pad = values;
-	//deviceContext->Unmap(timeBuffer, 0);
-	//deviceContext->VSSetConstantBuffers(1, 1, &timeBuffer);
+	deviceContext->VSSetSamplers(0, 1, &sampleState1);
 
 	//Additional
 	// Send light data to pixel shader
@@ -146,13 +141,34 @@ void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, con
 	deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	lightPtr = (LightBufferType*)mappedResource.pData;
 
-	lightPtr->diffuse = spotlight->getDiffuseColour();
-	lightPtr->ambient = spotlight->getAmbientColour();
-	lightPtr->direction = spotlight->getDirection();
-	lightPtr->type = spotlight->getType();
-	lightPtr->position = spotlight->getPosition();
-	lightPtr->atten = spotlight->getAtten();
-	lightPtr->pad = 0.0f;
+	//lightPtr->direction[0] = skylight->getDirection();
+//	lightPtr->direction[1] = pointlight->getDirection();
+//	lightPtr->pad = XMFLOAT2(0.0f, 0.0f);
+	lightPtr->ambient = pointlight->getAmbientColour();
+	//lightPtr->diffuse[0] = skylight->getDiffuseColour();
+	lightPtr->diffuse = pointlight->getDiffuseColour();
+//	lightPtr->diffuse = XMFLOAT4(0, 0, 0, 0);
+//	lightPtr->position[0] = XMFLOAT3(0, 0, 0);
+	lightPtr->position = pointlight->getPosition();
+//	lightPtr->pad1 = XMFLOAT2(0.0f, 0.0f);
+	lightPtr->atten = pointlight->getAtten();
+	lightPtr->pad2 = 0.0f;// XMFLOAT2(0.0f, 0.0f);
+	//	lightPtr->direction[0] = skylight->getDirection();
+	//lightPtr->direction[1] = pointlight->getDirection();
+	//lightPtr->pad = XMFLOAT2(0.0f, 0.0f);
+	//lightPtr->ambient = pointlight->getAmbientColour();
+	//lightPtr->diffuse[0] = skylight->getDiffuseColour();
+	//lightPtr->diffuse[1] = pointlight->getDiffuseColour();
+	//lightPtr->diffuse[2] = XMFLOAT4(0, 0, 0, 0);
+	//lightPtr->position[0] = XMFLOAT3(0, 0, 0);
+	//lightPtr->position[1] = pointlight->getPosition();
+	//lightPtr->pad1 = XMFLOAT2(0.0f, 0.0f);
+	//lightPtr->atten = pointlight->getAtten();
+	//lightPtr->pad2 = 0.0f;// XMFLOAT2(0.0f, 0.0f);
+
+
+	//->type[2] = pointlight->getType();
+
 
 	deviceContext->Unmap(lightBuffer, 0);
 	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);

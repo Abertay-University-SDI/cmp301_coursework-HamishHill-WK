@@ -24,6 +24,7 @@ protected:
 	void gui();
 
 	float pos[3];
+	bool renderSphere;
 
 	void firstRender();
 	void scndRender();
@@ -36,7 +37,10 @@ private:
 	PlaneMesh* ground;
 	AModel* model;
 
+	SphereMesh* pointLightSphere;
+
 	myLight* skylight;
+	myLight* pointlight;
 	myLight* spotlight;
 
 	OrthoMesh* orthomesh;

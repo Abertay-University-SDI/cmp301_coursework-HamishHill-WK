@@ -15,13 +15,15 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	// Initalise scene variables.
 	textureMgr->loadTexture(L"brick", L"res/brick1.dds");
 	//textureMgr->loadTexture(L"height", L"res/height.png");
-	textureMgr->loadTexture(L"myHeightMap", L"res/myHeightMap.png");
+	textureMgr->loadTexture(L"myHeightMap", L"res/myHeightMap.png");	
+	textureMgr->loadTexture(L"height", L"res/height.png");
 	textureMgr->loadTexture(L"snowTexture", L"res/snowTexture.png");
 	textureMgr->loadTexture(L"treeTex2", L"res/treeTex2.png");
 
 	model = new AModel(renderer->getDevice(), "res/por_tree.obj");
-
 	ground = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
+	pointLightSphere = new SphereMesh(renderer->getDevice(), renderer->getDeviceContext());
+
 	groundShader = new verManipShader(renderer->getDevice(), hwnd);
 	textureShader = new texShader(renderer->getDevice(), hwnd);
 	lightShader = new LightShader(renderer->getDevice(), hwnd);
@@ -29,23 +31,24 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	orthomesh = new OrthoMesh(renderer->getDevice(), renderer->getDeviceContext(), screenWidth , screenHeight);
 	renderTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
 
+	renderSphere = false;
 
 	skylight = new myLight();
-	skylight->setType(0);
-	skylight->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
+	//skylight->setType(0);
+	skylight->setDiffuseColour(0.0f, 0.0f, 0.2f, 0.2f);
+//	skylight->setAmbientColour(0.0f, 0.0f, 0.1f, 0.1f);
 	skylight->setDirection(0.7f, -0.7f, 0.0f);
 
-	spotlight = new myLight();
-	spotlight->setType(2);
-	spotlight->setAmbientColour(0.0f, 0.0f, 0.0f, 1.0f);
-	spotlight->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
-	spotlight->setPosition(25.0f, 10.0f, 25.0f);
-	spotlight->setAtten(0.5f, 0.25f, 0.0f);
+	pointlight = new myLight();
+	//pointlight->setType(2);
+	pointlight->setAmbientColour(0.2f, 0.0f, 0.0f, 0.5f);
+	pointlight->setDiffuseColour(1.0f, 0.5f, 0.0f, 1.0f);
+	pointlight->setPosition(25.0f, 10.0f, 25.0f);
+	pointlight->setAtten(0.5f, 0.25f, 0.0f);
 
-	pos[0] = 25.0f;
-	pos[1] = 10.0f;
-	pos[2] = 25.0f;
-
+	pos[0] = 50.0f;
+	pos[1] = 11.0f;
+	pos[2] = 50.0f;
 }
 
 
@@ -59,6 +62,30 @@ App1::~App1()
 	{
 		delete ground;
 		ground = 0;
+	}
+
+	if (renderTexture)
+	{
+		delete renderTexture;
+		renderTexture = 0;
+	}
+
+	if (orthomesh)
+	{
+		delete orthomesh;
+		orthomesh = 0;
+	}
+
+	if (skylight)
+	{
+		delete skylight;
+		skylight = 0;
+	}
+
+	if (pointlight)
+	{
+		delete  pointlight;
+		pointlight = 0;
 	}
 
 	if (model)
@@ -109,7 +136,7 @@ bool App1::frame()
 
 bool App1::render()
 {
-	spotlight->setPosition(pos[0], pos[1], pos[2]);
+	pointlight->setPosition(pos[0], pos[1], pos[2]);
 
 	// Clear the scene. (default blue colour)
 	firstRender();
@@ -137,21 +164,28 @@ void App1::firstRender()
 
 	//worldMatrix = XMMatrixRotationZ(45);
 	ground->sendData(renderer->getDeviceContext());
-	groundShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"myHeightMap"), textureMgr->getTexture(L"snowTexture"), skylight, spotlight);
+	groundShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"myHeightMap"), textureMgr->getTexture(L"snowTexture"), skylight, pointlight);
 	groundShader->render(renderer->getDeviceContext(), ground->getIndexCount());
-	//lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), spotlight);
+	//lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight);
 	//lightShader->render(renderer->getDeviceContext(), ground->getIndexCount());
 
 	// Render model
-	worldMatrix = XMMatrixTranslation(50.f, 10.f, 50.f);
 	XMMATRIX scaleMatrix = XMMatrixScaling(0.5f, 0.5f, 0.5f);
-	worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix);
+	//worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix);
 	model->sendData(renderer->getDeviceContext());
-	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), spotlight); // , skylight);
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight);
 	lightShader->render(renderer->getDeviceContext(), model->getIndexCount());
 
 	XMMATRIX scaleMatrix1 = XMMatrixScaling(2.0f, 2.0f, 2.0f);
 	worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix1);
+
+	if (renderSphere)
+	{
+		worldMatrix = XMMatrixTranslation(pointlight->getPosition().x, pointlight->getPosition().y, pointlight->getPosition().z);
+		pointLightSphere->sendData(renderer->getDeviceContext());
+		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight, skylight);
+		lightShader->render(renderer->getDeviceContext(), pointLightSphere->getIndexCount());
+	}
 
 	// Present the rendered scene to the screen.
 	renderer->setBackBufferRenderTarget();
@@ -168,6 +202,9 @@ void App1::scndRender()
 	XMMATRIX worldMatrix = renderer->getWorldMatrix();
 	XMMATRIX viewMatrix = camera->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
+
+
+
 
 	// Render normal scene, with light shader set.
 	
@@ -217,10 +254,11 @@ void App1::gui()
 	// Build UI
 	ImGui::Text("FPS: %.2f", timer->getFPS());
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
+	ImGui::Checkbox("Show Light Sources", &renderSphere);
 
-	ImGui::SliderFloat("x pos", &pos[0], 0.0f, 105.0f);
-	ImGui::SliderFloat("y pos", &pos[1], 0.0f, 105.0f);
-	ImGui::SliderFloat("z pos", &pos[2], 0.0f, 105.0f);
+	ImGui::SliderFloat("x pos", &pos[0], 1.0f, 100.0f);
+	ImGui::SliderFloat("y pos", &pos[1], 1.0f, 100.0f);
+	ImGui::SliderFloat("z pos", &pos[2], 1.0f, 100.0f);
 
 	// Render UI
 	ImGui::Render();

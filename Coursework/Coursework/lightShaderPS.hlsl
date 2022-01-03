@@ -41,42 +41,42 @@ float4 calculateLighting(float3 lightDirection, float3 normal, float4 diffuse)
 
 float4 main(InputType input) : SV_TARGET
 { 
-    //    float4 textureColour;
-    //    float4 lightColour;
+        float4 textureColour;
+        float4 lightColour;
+
+    textureColour = texture0.Sample(sampler0, (input.tex * 2));
 
         
-        
-    //if (type == 0.0f)
+    //switch (type)
     //{
-
-    //    textureColour = texture0.Sample(sampler0, (input.tex * 2));
-    //    lightColour = calculateLighting(-lightDirection, input.normal, diffuse);
-    //}
+    //    case 0:
+    //        lightColour = calculateLighting(-lightDirection, input.normal, diffuse);
+    //    break;
         
-    
-    
-    //if(type == 2.0f)
-    //{
-    
-	// Sample the texture. Calculate light intensity and colour, return light*texture for final pixel colour.
-        float4 textureColour = texture0.Sample(sampler0, input.tex);
+    //    case 1:
+    //    break;
+        
+    //    case 2:
+	    // Sample the texture. Calculate light intensity and colour, return light*texture for final pixel colour.
 	
-        float d; //array of distances from source to pixel -hh
-        float attenMod; //"" attenuation modifiers -hh
-        float3 lightVector; //"" normalized light vectors -hh
+            float d; //array of distances from source to pixel -hh
+            float attenMod; //"" attenuation modifiers -hh
+            float3 lightVector; //"" normalized light vectors -hh
 	
-        d = length(position.xyz - input.worldPosition);
+            d = length(position.xyz - input.worldPosition);
 
-        attenMod = 1 / ((atten.x + (atten.y * d)) + (atten.z * (d * d)));
+            attenMod = 1 / ((atten.x + (atten.y * d)) + (atten.z * (d * d)));
 	
-        lightVector = normalize(position.xyz - input.worldPosition);
+            lightVector = normalize(position.xyz - input.worldPosition);
 	
-        float4 finalDif;
+            float4 finalDif;
 	
-        finalDif = (calculateLighting(lightVector, input.normal, diffuse) * attenMod) + (calculateLighting(lightVector, input.normal, diffuse) * attenMod);
+            finalDif = (calculateLighting(lightVector, input.normal, diffuse) * attenMod); //+ (calculateLighting(lightVector, input.normal, diffuse) * attenMod);
 	
-        float4 lightColour = ambient + finalDif;
-   // }
+             lightColour = ambient + finalDif;
+        
+    //    break;
+ //   }
     
     return lightColour * textureColour;
 

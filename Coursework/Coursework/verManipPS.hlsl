@@ -9,9 +9,18 @@ cbuffer LightBuffer : register(b0)
     float4 ambient;
     float4 diffuseColour;
     float3 position;
-    int type;
-    float3 atten;
     float pad1;
+    float3 atten;
+    float pad2;    
+    
+    //float3 lightDirection[2];
+    //float2 pad;
+    //float4 ambient;
+    //float4 diffuseColour[3];
+    //float3 position[2];
+    //float2 pad1;
+    //float3 atten;
+    //float pad2;
 };
 
 struct InputType
@@ -20,7 +29,6 @@ struct InputType
     float2 tex : TEXCOORD0;
     float3 normal : NORMAL;
     float3 worldPosition : TEXCOORD1;
-
 };
 
 
@@ -34,63 +42,60 @@ float4 calculateLighting(float3 lightDirection, float3 normal, float4 diffuse)
 float4 main(InputType input) : SV_TARGET
 {
     float4 textureColour;
-    float4 lightColour;
+  //  float4 lightColour[3];
+    //float4 finalColour;
 
-    switch (type)
-    {
-        case 0:
-            textureColour = texture0.Sample(sampler0, (input.tex * 2));
-            lightColour = calculateLighting(-lightDirection, input.normal, diffuseColour);
-            break;
-        
-        case 1:
-            break;
-        
-        case 2:
-            textureColour = texture0.Sample(sampler0, input.tex*2);
-	
-            float d; //array of distances from source to pixel -hh
-            float attenMod; //"" attenuation modifiers -hh
-            float3 lightVector; //"" normalized light vectors -hh
-	
-            d = length(position.xyz - input.worldPosition);
-
-            attenMod = 1 / ((atten.x + (atten.y * d)) + (atten.z * (d * d)));
-	
-            lightVector = normalize(position.xyz - input.worldPosition);
-	
-            float4 finalDif;
-	
-            finalDif = (calculateLighting(lightVector, input.normal, diffuseColour) * attenMod) + (calculateLighting(lightVector, input.normal, diffuseColour) * attenMod);
-	
-            lightColour = ambient + finalDif;
-
-            break;
-        
-        default:
-            break;
-        
-    }
-    //if(type == 0.0f)
-    //{
-
-    //    textureColour = texture0.Sample(sampler0, (input.tex * 2));
-    //    lightColour = calculateLighting(-lightDirection, input.normal, diffuseColour);
-
-  
-    //}
+    textureColour = texture0.Sample(sampler0, (input.tex * 2));
     
- //   if(type == 2)
- //   {
-
+ //   for (int i = 0; i <= 2; i++)
+   // {
+        //switch (type[i])
+        //{
+        //    case 0:
+              // lightColour[0] = (calculateLighting(-lightDirection[0], input.normal, diffuseColour[0]));
+    //            break;
+        
+            //case 1:
+            //    break;
+        
+     //       case 2:
 	
-    //   // return lightColour * textureColour;
+                float d; //array of distances from source to pixel -hh
+                float attenMod; //"" attenuation modifiers -hh
+                float3 lightVector; //"" normalized light vectors -hh
+	
+                //d = length(position[1].xyz - input.worldPosition);
+                d = length(position.xyz - input.worldPosition);
+
+                attenMod = 1 / ((atten.x + (atten.y * d)) + (atten.z * (d * d)));
+	
+             //   lightVector = normalize(position[1].xyz - input.worldPosition);
+                lightVector = normalize(position.xyz - input.worldPosition);
+	
+                float4 finalDif;
+	
+  //  finalDif = /*(ambient + calculateLighting(-lightDirection[0], input.normal, diffuseColour[0])) +*/
+  //  (calculateLighting(lightVector, input.normal, diffuseColour[1]) * attenMod);    
+    
+    finalDif = /*(ambient + calculateLighting(-lightDirection[0], input.normal, diffuseColour[0])) +*/
+    (calculateLighting(lightVector, input.normal, diffuseColour) * attenMod);
+           
+       // lightColour[2] = (ambient[1] + finalDif);
+
+      //          break;
+        
+            //default:
+            //    break;
+        
+      //  }
    // }
-   // normalize(input.normal);
-    float4 colour = float4(input.normal.x, input.normal.y, input.normal.z, 0.0f);
+
+    //float4 colour = float4(input.normal.x, input.normal.y, input.normal.z, 0.0f);
     
-    return colour;
+    //return colour;
     
-  //  return lightColour * textureColour;
+    //finalColour = (lightColour[0] + lightColour[2]);
+    
+    return (finalDif + textureColour);
 }
 

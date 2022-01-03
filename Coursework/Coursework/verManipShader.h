@@ -16,16 +16,25 @@ private:
 		XMFLOAT4 ambient;
 		XMFLOAT4 diffuse;
 		XMFLOAT3 position;
-		int type;
-		XMFLOAT3 atten;
 		float pad1;
+		XMFLOAT3 atten;
+		float pad2;		
+		
+		//XMFLOAT3 direction[2];
+		//XMFLOAT2 pad;
+		//XMFLOAT4 ambient;
+		//XMFLOAT4 diffuse[3];
+		//XMFLOAT3 position[2];
+		//XMFLOAT2 pad1;
+		//XMFLOAT3 atten;
+		//float pad2;
 	};
 
 public:
 	verManipShader(ID3D11Device* device, HWND hwnd);
 	~verManipShader();
 
-	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightTex, ID3D11ShaderResourceView* texture, Light* light, myLight* spotlight);
+	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightTex, ID3D11ShaderResourceView* texture, myLight* skylight, myLight* pointlight);
 
 private:
 	void initShader(const wchar_t* cs, const wchar_t* ps);
