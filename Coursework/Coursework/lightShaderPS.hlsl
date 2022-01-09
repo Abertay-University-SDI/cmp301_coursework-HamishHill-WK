@@ -15,12 +15,12 @@ cbuffer LightBuffer : register(b0)
 
     float3 lightDirection;
     float pad;
-    float4 ambient;
-    float4 diffuse;
+    float4 ambient[2];
+    float4 diffuse[2];
     float3 position;
-    int type;
-    float3 atten;
     float pad1;
+    float3 atten;
+    float pad2;
 };
 
 struct InputType
@@ -71,9 +71,10 @@ float4 main(InputType input) : SV_TARGET
 	
             float4 finalDif;
 	
-            finalDif = (calculateLighting(lightVector, input.normal, diffuse) * attenMod); //+ (calculateLighting(lightVector, input.normal, diffuse) * attenMod);
+                        //calculate lighting for point light                                    //add directional light
+            finalDif = (calculateLighting(lightVector, input.normal, diffuse[1]) * attenMod) + (calculateLighting(lightDirection, input.normal, diffuse[0]));
 	
-             lightColour = ambient + finalDif;
+             lightColour = ambient[0] + ambient[1] + finalDif;
         
     //    break;
  //   }

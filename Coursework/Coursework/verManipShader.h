@@ -22,7 +22,7 @@ private:
 		
 		XMFLOAT3 direction;
 		float pad;
-		XMFLOAT4 ambient;
+		XMFLOAT4 ambient[2];
 		XMFLOAT4 diffuse[2];
 		XMFLOAT3 position;
 		float pad1;

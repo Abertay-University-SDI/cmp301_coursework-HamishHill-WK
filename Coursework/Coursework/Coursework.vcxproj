@@ -167,16 +167,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App1.cpp" />
+    <ClCompile Include="DepthShader.cpp" />
     <ClCompile Include="LightShader.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="myLight.cpp" />
+    <ClCompile Include="ShadowShader.cpp" />
     <ClCompile Include="texShader.cpp" />
     <ClCompile Include="verManipShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App1.h" />
+    <ClInclude Include="DepthShader.h" />
     <ClInclude Include="LightShader.h" />
     <ClInclude Include="myLight.h" />
+    <ClInclude Include="ShadowShader.h" />
     <ClInclude Include="texShader.h" />
     <ClInclude Include="verManipShader.h" />
   </ItemGroup>
@@ -186,6 +190,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="depthShaderPS.hlsl" />
+    <FxCompile Include="depthShaderVS.hlsl" />
     <FxCompile Include="lightShaderVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
@@ -198,6 +204,8 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
+    <FxCompile Include="shadowShaderPS.hlsl" />
+    <FxCompile Include="shadowShaderVS.hlsl" />
     <FxCompile Include="texShaderPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>

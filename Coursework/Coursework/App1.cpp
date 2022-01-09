@@ -33,28 +33,51 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	orthomesh = new OrthoMesh(renderer->getDevice(), renderer->getDeviceContext(), screenWidth , screenHeight);
 	renderTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
 
+	depthShader = new DepthShader(renderer->getDevice(), hwnd);
+	shadowShader = new ShadowShader(renderer->getDevice(), hwnd);
+
+	// Variables for defining shadow map
+	int shadowmapWidth = 1024;
+	int shadowmapHeight = 1024;
+	int sceneWidth = 100;
+	int sceneHeight = 100;
+
+	// This is your shadow map
+	shadowMap = new ShadowMap(renderer->getDevice(), shadowmapWidth, shadowmapHeight);
+
 	renderSphere = false;
 
 	skylight = new myLight();
 	//skylight->setType(0);
-	skylight->setDiffuseColour(0.0f, 0.35f, 0.6f, 0.2f);
-//	skylight->setAmbientColour(0.0f, 0.0f, 0.1f, 0.1f);
-	skylight->setDirection(0.7f, -0.7f, 0.0f);
+	skylight->setDiffuseColour(0.2f, 0.2f, 0.4f, 0.1f);
+	skylight->setAmbientColour(0.0f, 0.1f, 0.0f, 0.1f);
+	skylight->setDirection(0.7f, -0.7f, -0.5f);
+	skylight->generateOrthoMatrix((float)sceneWidth, (float)sceneHeight, 0.1f, 100.f);
+
 
 	pointlight = new myLight();
 	//pointlight->setType(2);
 	pointlight->setAmbientColour(0.1f, 0.1f, 0.0f, 0.1f);
-	pointlight->setDiffuseColour(1.0f, 0.75f, 0.0f, 1.0f);
-	pointlight->setPosition(25.0f, 10.0f, 25.0f);
+	pointlight->setDiffuseColour(1.0f, 0.5f, 0.0f, 1.0f);
+	pointlight->setPosition(50.0f, 11.0f, 50.0f);
 	pointlight->setAtten(0.5f, 0.25f, 0.0f);
 
-	pos.x = 50.0f;
-	pos.y = 11.0f;
-	pos.z = 50.0f;
+	//pos.x = 50.0f;
+	//pos.y = 11.0f;
+	//pos.z = 50.0f;
 
-	direction.x = 0.5;
-	direction.y = -0.7;
-	direction.z = 0.0f;
+	pos = pointlight->getPosition();
+	ambi = pointlight->getAmbientColour();
+	attenu = pointlight->getAtten();
+	pointdiffuse = pointlight->getDiffuseColour();
+
+	skydiffuse = skylight->getDiffuseColour();
+	direction = skylight->getDirection();
+	skyAmbi = skylight->getAmbientColour();
+
+	//direction.x = 0.5;
+	//direction.y = -0.7;
+	//direction.z = -0.5f;
 }
 
 
@@ -94,11 +117,14 @@ App1::~App1()
 		pointlight = 0;
 	}
 
-	//if (model[4])
-	//{
-	//	delete model[4];
-	//	model[4] = 0;
-	//}
+	for (int i = 0; i < 4; i++)
+	{
+		if (model[i])
+		{
+			delete model[i];
+			model[i] = 0;
+		}
+	}
 
 	if (textureShader)
 	{
@@ -143,7 +169,13 @@ bool App1::frame()
 bool App1::render()
 {
 	pointlight->setPosition(pos.x, pos.y, pos.z);
+	pointlight->setDiffuseColour(pointdiffuse.w, pointdiffuse.x, pointdiffuse.y, pointdiffuse.z);
+	pointlight->setAmbientColour(ambi.w, ambi.x, ambi.y, ambi.z);
+	pointlight->setAtten(attenu.x, attenu.y, attenu.z);
+
 	skylight->setDirection(direction.x, direction.y, direction.z);
+	skylight->setDiffuseColour(skydiffuse.w, skydiffuse.x, skydiffuse.y, skydiffuse.z);
+	skylight->setAmbientColour(skyAmbi.w, skyAmbi.x, skyAmbi.y, skyAmbi.z);
 
 	// Clear the scene. (default blue colour)
 	firstRender();
@@ -284,13 +316,66 @@ void App1::gui()
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
 	ImGui::Checkbox("Show Light Sources", &renderSphere);
 
-	ImGui::SliderFloat("x pos", &pos.x, 1.0f, 100.0f);
-	ImGui::SliderFloat("y pos", &pos.y, 1.0f, 100.0f);
-	ImGui::SliderFloat("z pos", &pos.z, 1.0f, 100.0f);	
+	if (ImGui::Button("Reset to default values"))
+	{
+		pos = XMFLOAT3(50.0f, 11.0f, 50.0f);
+		direction = XMFLOAT3(0.7f, -0.7f, -0.5f);
+		ambi = XMFLOAT4(0.1f, 0.1f, 0.0f, 0.1f);
+		attenu = XMFLOAT3(0.5f, 0.25f, 0.0f);
+		pointdiffuse = XMFLOAT4(1.0f, 0.5f, 0.0f, 1.0f);
+		skydiffuse = XMFLOAT4(0.2f, 0.2f, 0.4f, 0.1f);
+		skyAmbi = XMFLOAT4(0.0f, 0.1f, 0.0f, 0.1f);
+	}
+
+
+	if (ImGui::CollapsingHeader("Point light controls"))
+	{
+		ImGui::Indent(10);
+		ImGui::SliderFloat("x pos", &pos.x, 1.0f, 100.0f);
+		ImGui::SliderFloat("y pos", &pos.y, 1.0f, 100.0f);
+		ImGui::SliderFloat("z pos", &pos.z, 1.0f, 100.0f);		
+		
+		ImGui::SliderFloat("Attenuation x", &attenu.x, 0.0f, 1.0f);
+		ImGui::SliderFloat("Attenuation y", &attenu.y, 0.0f, 1.0f);
+		ImGui::SliderFloat("Attenuation z", &attenu.z, 0.0f, 1.0f);
+
+		if (ImGui::CollapsingHeader("Colour"))
+		{
+			ImGui::Indent(10);
+			ImGui::SliderFloat("Red", &pointdiffuse.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("Blue", &pointdiffuse.y, 0.0f, 1.0f);
+			ImGui::SliderFloat("Green", &pointdiffuse.z, 0.0f, 1.0f);
+			ImGui::SliderFloat("Alpha", &pointdiffuse.w, 0.0f, 1.0f);
+
+			ImGui::SliderFloat("Ambient Red", &ambi.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("Ambient Blue", &ambi.y, 0.0f, 1.0f);
+			ImGui::SliderFloat("Ambient Green", &ambi.z, 0.0f, 1.0f);
+			ImGui::SliderFloat("Ambient Alpha", &ambi.w, 0.0f, 1.0f);
+			ImGui::Indent(-10);
+		}
 	
-	ImGui::SliderFloat("Direction x", &direction.x, -1.0f, 1.0f);
-	ImGui::SliderFloat("Direction y", &direction.y, -1.0f, 1.0f);
-	ImGui::SliderFloat("Direction z", &direction.z, -1.0f, 1.0f);
+		ImGui::Indent(-10);
+	}
+	
+	if (ImGui::CollapsingHeader("Sky light controls"))
+	{
+		ImGui::Indent(10);
+		ImGui::SliderFloat("Direction x", &direction.x, -1.0f, 1.0f);
+		ImGui::SliderFloat("Direction y", &direction.y, -1.0f, 1.0f);
+		ImGui::SliderFloat("Direction z", &direction.z, -1.0f, 1.0f);
+
+		ImGui::SliderFloat("Red ", &skydiffuse.x, 0.0f, 1.0f);
+		ImGui::SliderFloat("Blue ", &skydiffuse.y, 0.0f, 1.0f);
+		ImGui::SliderFloat("Green ", &skydiffuse.z, 0.0f, 1.0f);
+		ImGui::SliderFloat("Alpha ", &skydiffuse.w, 0.0f, 1.0f);
+
+		ImGui::SliderFloat("Ambient Red ", &skyAmbi.x, 0.0f, 1.0f);
+		ImGui::SliderFloat("Ambient Blue ", &skyAmbi.y, 0.0f, 1.0f);
+		ImGui::SliderFloat("Ambient Green ", &skyAmbi.z, 0.0f, 1.0f);
+		ImGui::SliderFloat("Ambient Alpha ", &skyAmbi.w, 0.0f, 1.0f);
+
+		ImGui::Indent(-10);
+	}
 
 	// Render UI
 	ImGui::Render();

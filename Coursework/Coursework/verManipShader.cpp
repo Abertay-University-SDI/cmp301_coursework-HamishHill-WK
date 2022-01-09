@@ -144,7 +144,9 @@ void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, con
 	lightPtr->direction = skylight->getDirection();
 //	lightPtr->direction[1] = pointlight->getDirection();
 //	lightPtr->pad = XMFLOAT2(0.0f, 0.0f);
-	lightPtr->ambient = pointlight->getAmbientColour();
+	lightPtr->ambient[0] = pointlight->getAmbientColour();	
+	lightPtr->ambient[1] = skylight->getAmbientColour();
+
 	lightPtr->diffuse[0] = skylight->getDiffuseColour();
 	lightPtr->diffuse[1] = pointlight->getDiffuseColour();
 //	lightPtr->diffuse = XMFLOAT4(0, 0, 0, 0);

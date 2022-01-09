@@ -18,12 +18,12 @@ private:
 		XMFLOAT4 atten[2];	*/	
 		XMFLOAT3 direction;
 		float pad;
-		XMFLOAT4 ambient;
-		XMFLOAT4 diffuse;
+		XMFLOAT4 ambient[2];
+		XMFLOAT4 diffuse[2];
 		XMFLOAT3 position;
-		int type;
-		XMFLOAT3 atten;
 		float pad1;
+		XMFLOAT3 atten;
+		float pad2;
 	};
 
 public:

@@ -15,7 +15,7 @@ cbuffer LightBuffer : register(b0)
     
     float3 lightDirection;
     float pad;
-    float4 ambient;
+    float4 ambient[2];
     float4 diffuseColour[2];
     float3 position;
     float pad1;
@@ -60,25 +60,25 @@ float4 main(InputType input) : SV_TARGET
         
      //       case 2:
 	
-                float d; //array of distances from source to pixel -hh
-                float attenMod; //"" attenuation modifiers -hh
-                float3 lightVector; //"" normalized light vectors -hh
+    float d; //array of distances from source to pixel -hh
+    float attenMod; //"" attenuation modifiers -hh
+    float3 lightVector; //"" normalized light vectors -hh
 	
-                //d = length(position[1].xyz - input.worldPosition);
-                d = length(position.xyz - input.worldPosition);
+    //d = length(position[1].xyz - input.worldPosition);
+    d = length(position.xyz - input.worldPosition);
 
-                attenMod = 1 / ((atten.x + (atten.y * d)) + (atten.z * (d * d)));
+    attenMod = 1 / ((atten.x + (atten.y * d)) + (atten.z * (d * d)));
 	
-             //   lightVector = normalize(position[1].xyz - input.worldPosition);
-                lightVector = normalize(position.xyz - input.worldPosition);
+    //   lightVector = normalize(position[1].xyz - input.worldPosition);
+    lightVector = normalize(position.xyz - input.worldPosition);
 	
-                float4 finalDif;
+    float4 finalDif;
 	
   //  finalDif = /*(ambient + calculateLighting(-lightDirection[0], input.normal, diffuseColour[0])) +*/
   //  (calculateLighting(lightVector, input.normal, diffuseColour[1]) * attenMod);    
     
     finalDif = calculateLighting(-lightDirection, input.normal, diffuseColour[0]) +
-    (calculateLighting(lightVector, input.normal, diffuseColour[1]) * attenMod) + ambient;
+    (calculateLighting(lightVector, input.normal, diffuseColour[1]) * attenMod) + ambient[0] + ambient[1];
            
        // lightColour[2] = (ambient[1] + finalDif);
 

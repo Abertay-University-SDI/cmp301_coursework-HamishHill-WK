@@ -4,9 +4,13 @@
 
 // Includes
 #include "DXF.h"
+
 #include "verManipShader.h"
 #include "texShader.h"
 #include "LightShader.h"
+#include "DepthShader.h"
+#include "ShadowShader.h"
+
 #include "myLight.h"
 
 class App1 : public BaseApplication
@@ -23,8 +27,19 @@ protected:
 	bool render();
 	void gui();
 
+	//modifiable lighting values for imgui
 	XMFLOAT3 pos;
 	XMFLOAT3 direction;
+
+	XMFLOAT4 skydiffuse;
+	XMFLOAT4 pointdiffuse;
+
+	XMFLOAT3 attenu;
+	XMFLOAT4 ambi;
+
+	XMFLOAT4 skyAmbi;
+
+
 	bool renderSphere;
 
 	void firstRender();
@@ -34,6 +49,8 @@ private:
 	verManipShader* groundShader;
 	texShader* textureShader;
 	LightShader* lightShader;
+	DepthShader* depthShader;
+	ShadowShader* shadowShader;
 
 	PlaneMesh* ground;
 	AModel* model[4];
@@ -46,6 +63,8 @@ private:
 
 	OrthoMesh* orthomesh;
 	RenderTexture* renderTexture;
+
+	ShadowMap* shadowMap;
 };
 
 #endif
