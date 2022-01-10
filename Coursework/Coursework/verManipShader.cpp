@@ -60,23 +60,13 @@ void verManipShader::initShader(const wchar_t* vsFilename, const wchar_t* psFile
 	matrixBufferDesc.StructureByteStride = 0;
 	renderer->CreateBuffer(&matrixBufferDesc, NULL, &matrixBuffer);
 
-	//timeBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	//timeBufferDesc.ByteWidth = sizeof(TimeBufferType);
-	//timeBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	//timeBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	//timeBufferDesc.MiscFlags = 0;
-	//timeBufferDesc.StructureByteStride = 0;
-	//renderer->CreateBuffer(&timeBufferDesc, NULL, &timeBuffer);
-
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	//samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	//samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	//samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;	
+
 
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
-samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
-samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
 
 	samplerDesc.MipLODBias = 0.0f;
 	samplerDesc.MaxAnisotropy = 1;
@@ -86,9 +76,9 @@ samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
 	renderer->CreateSamplerState(&samplerDesc, &sampleState1);
 
 	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 
 	samplerDesc.MipLODBias = 0.0f;
 	samplerDesc.MaxAnisotropy = 1;

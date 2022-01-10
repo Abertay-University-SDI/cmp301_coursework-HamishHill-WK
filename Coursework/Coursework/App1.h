@@ -10,6 +10,8 @@
 #include "LightShader.h"
 #include "DepthShader.h"
 #include "ShadowShader.h"
+#include "verEdgeShader.h"
+#include "horEdgeShader.h"
 
 #include "myLight.h"
 
@@ -29,6 +31,7 @@ protected:
 
 	//modifiable lighting values for imgui
 	XMFLOAT3 pos;
+	XMFLOAT3 skyPos;
 	XMFLOAT3 direction;
 
 	XMFLOAT4 skydiffuse;
@@ -42,8 +45,15 @@ protected:
 
 	bool renderSphere;
 
+	void depthRender();
 	void firstRender();
 	void scndRender();
+
+	void verticalEdge();
+	void horizontalEdge();
+
+	void depthPass();
+	void finalPass();
 
 private:
 	verManipShader* groundShader;
@@ -51,18 +61,26 @@ private:
 	LightShader* lightShader;
 	DepthShader* depthShader;
 	ShadowShader* shadowShader;
+	verEdgeShader* verEdgeShader1;
+	horEdgeShader* horEdgeShader1;
 
 	PlaneMesh* ground;
-	AModel* model[4];
+	PlaneMesh* shadowGround;
+	AModel* model[5];
 
 	SphereMesh* pointLightSphere;
 
 	myLight* skylight;
 	myLight* pointlight;
 	myLight* spotlight;
+	//myLight* shadowlight;
 
 	OrthoMesh* orthomesh;
 	RenderTexture* renderTexture;
+	RenderTexture* renderTexture1;
+	RenderTexture* renderTexture2;
+	RenderTexture* horizEdgeTexture;
+	RenderTexture* vertEdgeTexture;
 
 	ShadowMap* shadowMap;
 };

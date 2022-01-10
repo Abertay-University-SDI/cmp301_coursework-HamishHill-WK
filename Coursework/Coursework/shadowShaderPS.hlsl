@@ -2,21 +2,21 @@
 Texture2D shaderTexture : register(t0);
 Texture2D depthMapTexture : register(t1);
 
-SamplerState diffuseSampler  : register(s0);
+SamplerState diffuseSampler : register(s0);
 SamplerState shadowSampler : register(s1);
 
 cbuffer LightBuffer : register(b0)
 {
-	float4 ambient;
-	float4 diffuse;
-	float3 direction;
+    float4 ambient;
+    float4 diffuse;
+    float3 direction;
 };
 
 struct InputType
 {
     float4 position : SV_POSITION;
     float2 tex : TEXCOORD0;
-	float3 normal : NORMAL;
+    float3 normal : NORMAL;
     float4 lightViewPos : TEXCOORD1;
 };
 
@@ -65,7 +65,7 @@ float2 getProjectiveCoords(float4 lightViewPosition)
 
 float4 main(InputType input) : SV_TARGET
 {
-    float shadowMapBias = 0.005f;
+    float shadowMapBias = 0.01f;
     float4 colour = float4(0.f, 0.f, 0.f, 1.f);
     float4 textureColour = shaderTexture.Sample(diffuseSampler, input.tex);
 

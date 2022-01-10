@@ -1,5 +1,4 @@
-// depth shader.cpp
-#include "depthshader.h"
+#include "DepthShader.h"
 
 DepthShader::DepthShader(ID3D11Device* device, HWND hwnd) : BaseShader(device, hwnd)
 {

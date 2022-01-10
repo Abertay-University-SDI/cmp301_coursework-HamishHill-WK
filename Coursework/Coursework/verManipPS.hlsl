@@ -80,21 +80,6 @@ float4 main(InputType input) : SV_TARGET
     finalDif = calculateLighting(-lightDirection, input.normal, diffuseColour[0]) +
     (calculateLighting(lightVector, input.normal, diffuseColour[1]) * attenMod) + ambient[0] + ambient[1];
            
-       // lightColour[2] = (ambient[1] + finalDif);
-
-      //          break;
-        
-            //default:
-            //    break;
-        
-      //  }
-   // }
-
-    //float4 colour = float4(input.normal.x, input.normal.y, input.normal.z, 0.0f);
-    
-    //return colour;
-    
-    //finalColour = (lightColour[0] + lightColour[2]);
     
     return (finalDif * textureColour);
 }
