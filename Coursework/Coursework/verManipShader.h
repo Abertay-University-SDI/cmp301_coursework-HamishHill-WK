@@ -27,14 +27,14 @@ private:
 		XMFLOAT3 position;
 		float pad1;
 		XMFLOAT3 atten;
-		float pad2;
+		bool norms;
 	};
 
 public:
 	verManipShader(ID3D11Device* device, HWND hwnd);
 	~verManipShader();
 
-	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightTex, ID3D11ShaderResourceView* texture, myLight* skylight, myLight* pointlight);
+	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightTex, ID3D11ShaderResourceView* texture, myLight* skylight, myLight* pointlight, bool normals);
 
 private:
 	void initShader(const wchar_t* cs, const wchar_t* ps);

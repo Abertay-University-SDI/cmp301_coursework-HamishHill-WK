@@ -101,7 +101,7 @@ void verManipShader::initShader(const wchar_t* vsFilename, const wchar_t* psFile
 }
 
 
-void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* heightTex, ID3D11ShaderResourceView* texture, myLight* skylight, myLight* pointlight) 
+void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* heightTex, ID3D11ShaderResourceView* texture, myLight* skylight, myLight* pointlight, bool normals) 
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -144,7 +144,7 @@ void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, con
 	lightPtr->position = pointlight->getPosition();
 //	lightPtr->pad1 = XMFLOAT2(0.0f, 0.0f);
 	lightPtr->atten = pointlight->getAtten();
-	lightPtr->pad2 = 0.0f;// XMFLOAT2(0.0f, 0.0f);
+	lightPtr->norms = normals;// XMFLOAT2(0.0f, 0.0f);
 	//	lightPtr->direction[0] = skylight->getDirection();
 	//lightPtr->direction[1] = pointlight->getDirection();
 	//lightPtr->pad = XMFLOAT2(0.0f, 0.0f);

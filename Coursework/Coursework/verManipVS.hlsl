@@ -32,17 +32,6 @@ float heightMap(float2 uv)
 	return texColour;
 }
 
-//float calcCol(float2 uv)
-//{
-//    float3 colour;
-//    float col;
-//    colour = texture0.Sample(sampler0, uv);
-	
-//    col = colour.x + colour.y + colour.z;
-//    return col;
-
-//}
-
 float3 calcNormals(float2 UV)
 {
     float3 norm = float3(0.0f, 0.0f, 0.0f);

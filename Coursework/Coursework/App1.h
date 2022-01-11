@@ -44,6 +44,8 @@ protected:
 
 
 	bool renderSphere;
+	bool edgeEnabled;
+	bool showNorms;
 
 	void depthRender();
 	void firstRender();
@@ -52,7 +54,7 @@ protected:
 	void verticalEdge();
 	void horizontalEdge();
 
-	void depthPass();
+	//void depthPass();
 	void finalPass();
 
 private:
@@ -66,19 +68,19 @@ private:
 
 	PlaneMesh* ground;
 	PlaneMesh* shadowGround;
-	AModel* model[5];
+	AModel* model[4];
 
 	SphereMesh* pointLightSphere;
 
 	myLight* skylight;
 	myLight* pointlight;
-	myLight* spotlight;
+	//myLight* spotlight;
 	//myLight* shadowlight;
 
 	OrthoMesh* orthomesh;
 	RenderTexture* renderTexture;
-	RenderTexture* renderTexture1;
-	RenderTexture* renderTexture2;
+	//RenderTexture* renderTexture1;
+	//RenderTexture* renderTexture2;
 	RenderTexture* horizEdgeTexture;
 	RenderTexture* vertEdgeTexture;
 

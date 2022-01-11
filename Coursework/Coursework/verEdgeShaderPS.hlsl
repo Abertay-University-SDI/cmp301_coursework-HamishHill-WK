@@ -17,20 +17,20 @@ float4 main(InputType input) : SV_TARGET
 {
     float4 colour;
 
-    float weight = -0.9;
+    float weight = -1.0;
     colour = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
     float texelSize = 1.0f / screenHeight;
     // Add the vertical pixels to the colour by the specific weight of each.
-    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * -1.0f)) * weight;
-    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * -0.75f)) * weight;
-    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * -0.5f)) * weight;
-    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * -0.25f)) * weight;
+    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * -0.2f)) * weight;
+    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * -0.15f)) * weight;
+    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * -0.1f)) * weight;
+    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * -0.05f)) * weight;
     colour += shaderTexture.Sample(SampleType, input.tex) * 9;
-    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * 0.25f)) * weight;
-    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * 0.5f)) * weight;
-    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * 0.75f)) * weight;
-    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * 1.0f)) * weight;
+    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * 0.05f)) * weight;
+    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * 0.1f)) * weight;
+    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * 0.15f)) * weight;
+    colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * 0.2f)) * weight;
  
     // Set the alpha channel to one.
     colour.a = 1.0f;

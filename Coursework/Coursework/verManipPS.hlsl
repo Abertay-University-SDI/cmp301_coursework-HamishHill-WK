@@ -20,7 +20,7 @@ cbuffer LightBuffer : register(b0)
     float3 position;
     float pad1;
     float3 atten;
-    float pad2;
+    bool norms;
 };
 
 struct InputType
@@ -41,6 +41,12 @@ float4 calculateLighting(float3 lightDirection, float3 normal, float4 diffuse)
 
 float4 main(InputType input) : SV_TARGET
 {
+    if(norms)
+    {
+        float4 colour = float4(input.normal.x, input.normal.y, input.normal.z, 0.0f);
+        return colour;
+    }
+    
     float4 textureColour;
   //  float4 lightColour[3];
     //float4 finalColour;
@@ -78,9 +84,11 @@ float4 main(InputType input) : SV_TARGET
   //  (calculateLighting(lightVector, input.normal, diffuseColour[1]) * attenMod);    
     
     finalDif = calculateLighting(-lightDirection, input.normal, diffuseColour[0]) +
-    (calculateLighting(lightVector, input.normal, diffuseColour[1]) * attenMod) + ambient[0] + ambient[1];
-           
+    (calculateLighting(lightVector, input.normal, diffuseColour[1]) * attenMod) + ambient[0] + ambient[1];       
     
     return (finalDif * textureColour);
+    
+
+    
 }
 
