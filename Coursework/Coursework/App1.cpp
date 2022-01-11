@@ -609,7 +609,7 @@ void App1::gui()
 	ImGui::Text("FPS: %.2f", timer->getFPS());
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);	
 	ImGui::Checkbox("Edge Detection ", &edgeEnabled);	
-	ImGui::Checkbox("Show Displacement map normals ", &showNorms);
+	ImGui::Checkbox("Show displacement map normals ", &showNorms);
 
 
 	if (ImGui::Button("Reset to default values"))
@@ -624,7 +624,7 @@ void App1::gui()
 		skyPos = XMFLOAT3(0.0f, 20.0f, 0.0f);
 		renderSphere = true;
 		edgeEnabled = true;
-		showNorms = true;
+		showNorms = false;
 	}
 
 
