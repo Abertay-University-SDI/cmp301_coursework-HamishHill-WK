@@ -262,8 +262,6 @@ void App1::firstRender()
 	renderTexture->setRenderTarget(renderer->getDeviceContext());
 	renderTexture->clearRenderTarget(renderer->getDeviceContext(), 1.0f, 0.0f, 0.0f, 1.0f);
 
-
-
 	// Generate the view matrix based on the camera's position.
 //	camera->update();
 
@@ -273,9 +271,9 @@ void App1::firstRender()
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
 	//worldMatrix = XMMatrixRotationZ(45);
-	ground->sendData(renderer->getDeviceContext());
-	groundShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"myHeightMap"), textureMgr->getTexture(L"snowTexture"), skylight, pointlight, showNorms);
-	groundShader->render(renderer->getDeviceContext(), ground->getIndexCount());
+	//ground->sendData(renderer->getDeviceContext());
+	//groundShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"myHeightMap"), textureMgr->getTexture(L"snowTexture"), skylight, pointlight, showNorms);
+	//groundShader->render(renderer->getDeviceContext(), ground->getIndexCount());
 	//lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight);
 	//lightShader->render(renderer->getDeviceContext(), ground->getIndexCount());
 
@@ -459,13 +457,17 @@ void App1::scndRender()
 	XMMATRIX viewMatrix = camera->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
-	worldMatrix = XMMatrixTranslation(-115, 5, 10);
-	XMMATRIX shadowPlaneScaleMatrix = XMMatrixScaling(0.5, 1.0, 0.5);
-	worldMatrix = XMMatrixMultiply(worldMatrix, shadowPlaneScaleMatrix);
+	worldMatrix = XMMatrixTranslation(-115, 0, 10);
+	//XMMATRIX shadowPlaneScaleMatrix = XMMatrixScaling(0.5, 1.0, 0.5);
+	//worldMatrix = XMMatrixMultiply(worldMatrix, shadowPlaneScaleMatrix);
 
-	shadowGround->sendData(renderer->getDeviceContext());
-	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), shadowMap->getDepthMapSRV(), skylight);
-	shadowShader->render(renderer->getDeviceContext(), shadowGround->getIndexCount());
+	//shadowGround->sendData(renderer->getDeviceContext());
+	//shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), shadowMap->getDepthMapSRV(), skylight);
+	//shadowShader->render(renderer->getDeviceContext(), shadowGround->getIndexCount());
+
+	ground->sendData(renderer->getDeviceContext());
+	groundShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"myHeightMap"), textureMgr->getTexture(L"snowTexture"), shadowMap->getDepthMapSRV(), skylight, pointlight, showNorms);
+	groundShader->render(renderer->getDeviceContext(), ground->getIndexCount());
 
 	XMMATRIX scaleMatrix = XMMatrixScaling(2.0f, 1.0f, 2.0f);
 	worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix);

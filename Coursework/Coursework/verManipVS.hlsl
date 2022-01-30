@@ -7,6 +7,8 @@ cbuffer MatrixBuffer : register(b0)
 	matrix worldMatrix;
 	matrix viewMatrix;
 	matrix projectionMatrix;
+    matrix lightViewMatrix;
+    matrix lightProjectionMatrix;
 };
 
 
@@ -23,6 +25,7 @@ struct OutputType
 	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
     float3 worldPosition : TEXCOORD1;
+    float4 lightViewPos : TEXCOORD2;
 };
 
 float heightMap(float2 uv)
@@ -98,6 +101,10 @@ OutputType main(InputType input)
     output.normal = calcNormals(input.tex);
     //output.normal = input.normal;
    // output.normal = normalize(output.normal);
+	
+    output.lightViewPos = mul(input.position, worldMatrix);
+    output.lightViewPos = mul(output.lightViewPos, lightViewMatrix);
+    output.lightViewPos = mul(output.lightViewPos, lightProjectionMatrix);
 
     output.worldPosition = mul(input.position, worldMatrix).xyz;
 
