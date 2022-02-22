@@ -38,7 +38,7 @@ float heightMap(float2 uv)
 float3 calcNormals(float2 UV)
 {
     float3 norm = float3(0.0f, 0.0f, 0.0f);
-    float d = 0.05f;
+    float d = 1.0f;
 	
     float2 tanUV = float2(UV + float2(-d, 0.0f));
     float2 tan1UV = float2(UV + float2(d, 0.0f));

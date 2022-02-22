@@ -14,7 +14,8 @@ private:
 	struct ScreenSizeBufferType
 	{
 		float screenHeight;
-		XMFLOAT3 padding;
+		float screenWidth;
+		XMFLOAT2 padding;
 	};
 
 public:
@@ -22,7 +23,7 @@ public:
 	verEdgeShader(ID3D11Device* device, HWND hwnd);
 	~verEdgeShader();
 
-	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* texture, float width);
+	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* texture, float height ,float width);
 
 private:
 	void initShader(const wchar_t* vs, const wchar_t* ps);

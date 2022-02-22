@@ -242,7 +242,7 @@ bool App1::render()
 
 	if (edgeEnabled)
 	{
-		horizontalEdge();
+		//horizontalEdge();
 
 		verticalEdge();
 	}
@@ -410,6 +410,11 @@ void App1::depthRender()
 	//XMMATRIX shadowPlaneScaleMatrix = XMMatrixScaling(0.5, 0.5, 0.5);
 	//worldMatrix = XMMatrixMultiply(worldMatrix, shadowPlaneScaleMatrix);
 
+	ground->sendData(renderer->getDeviceContext());
+	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
+	depthShader->render(renderer->getDeviceContext(), ground->getIndexCount());
+	worldMatrix = XMMatrixTranslation(30, -5, -30);
+
 	//XMMATRIX scaleMatrix = XMMatrixScaling(0.5f, 0.5f, 0.5f);
 	//worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix);
 	worldMatrix = XMMatrixTranslation(-30, 5, 30);
@@ -544,6 +549,7 @@ void App1::verticalEdge()
 	XMMATRIX worldMatrix, baseViewMatrix, orthoMatrix;
 
 	float screenSizeY = (float)vertEdgeTexture->getTextureHeight();
+	float screenSizeX = (float)vertEdgeTexture->getTextureWidth();
 	vertEdgeTexture->setRenderTarget(renderer->getDeviceContext());
 	vertEdgeTexture->clearRenderTarget(renderer->getDeviceContext(), 0.0f, 1.0f, 1.0f, 1.0f);
 
@@ -555,7 +561,7 @@ void App1::verticalEdge()
 	// Render for Vertical Blur
 	renderer->setZBuffer(false);
 	orthomesh->sendData(renderer->getDeviceContext());
-	verEdgeShader1->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, horizEdgeTexture->getShaderResourceView(), screenSizeY);
+	verEdgeShader1->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, renderTexture->getShaderResourceView(), screenSizeY, screenSizeX);
 	verEdgeShader1->render(renderer->getDeviceContext(), orthomesh->getIndexCount());
 	renderer->setZBuffer(true);
 

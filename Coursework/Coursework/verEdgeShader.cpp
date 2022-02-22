@@ -81,7 +81,7 @@ void verEdgeShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilen
 }
 
 
-void verEdgeShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* texture, float height)
+void verEdgeShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* texture, float height, float width)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
@@ -102,11 +102,18 @@ void verEdgeShader::setShaderParameters(ID3D11DeviceContext* deviceContext, cons
 
 	//Additional
 	// Send light data to pixel shader
-	ScreenSizeBufferType* widthPtr;
+	ScreenSizeBufferType* heightPtr;
 	deviceContext->Map(screenSizeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	heightPtr = (ScreenSizeBufferType*)mappedResource.pData;
+	heightPtr->screenHeight = height;
+
+	ScreenSizeBufferType* widthPtr;
+	//deviceContext->Map(screenSizeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	widthPtr = (ScreenSizeBufferType*)mappedResource.pData;
-	widthPtr->screenHeight = height;
-	widthPtr->padding = XMFLOAT3(1.0f, 1.f, 1.f);
+	widthPtr->screenWidth = width;
+
+	widthPtr->padding = XMFLOAT2(1.0f, 1.0f);
+
 	deviceContext->Unmap(screenSizeBuffer, 0);
 	deviceContext->PSSetConstantBuffers(0, 1, &screenSizeBuffer);
 

@@ -92,8 +92,6 @@ float4 main(InputType input) : SV_TARGET
 
     textureColour = texture0.Sample(sampler0, (input.tex * 2));
     float2 pTexCoord = getProjectiveCoords(input.lightViewPos);
-
-
 	
     float d; //array of distances from source to pixel -hh
     float attenMod; //"" attenuation modifiers -hh
