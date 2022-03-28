@@ -31,17 +31,25 @@ protected:
 
 	//modifiable lighting values for imgui
 	XMFLOAT3 pos;
+	XMFLOAT3 spotPos;
 	XMFLOAT3 skyPos;
-	XMFLOAT3 direction;
+	XMFLOAT3 direction;	
+	XMFLOAT3 spotDirection;
 
 	XMFLOAT4 skydiffuse;
-	XMFLOAT4 pointdiffuse;
+	XMFLOAT4 pointdiffuse;	
+	XMFLOAT4 spotDiffuse;
 
-	XMFLOAT3 attenu;
-	XMFLOAT4 ambi;
-
+	XMFLOAT3 attenu;	
+	XMFLOAT3 spotAttenu;
+	XMFLOAT4 ambi;	
+	XMFLOAT4 spotAmbi;
 	XMFLOAT4 skyAmbi;
 
+	XMFLOAT4 specularColour;
+	float specularPower;
+	float spotRange;
+	float spotCone;
 
 	bool renderSphere;
 	bool edgeEnabled;
@@ -71,10 +79,11 @@ private:
 	AModel* model[4];
 
 	SphereMesh* pointLightSphere;
+	SphereMesh* spotLightSphere;
 
 	myLight* skylight;
 	myLight* pointlight;
-	//myLight* spotlight;
+	myLight* spotlight;
 	//myLight* shadowlight;
 
 	OrthoMesh* orthomesh;

@@ -94,59 +94,30 @@ float4 main(InputType input) : SV_TARGET
      //   {
         
 	
-            float d; //array of distances from source to pixel -hh
-            float attenMod; //"" attenuation modifiers -hh
-            float3 lightVector; //"" normalized light vectors -hh
+        float d; //array of distances from source to pixel -hh
+        float attenMod; //"" attenuation modifiers -hh
+        float3 lightVector; //"" normalized light vectors -hh
 	
-            d = length(position.xyz - input.worldPosition);
+        d = length(position.xyz - input.worldPosition);
 
-            attenMod = 1 / ((atten.x + (atten.y * d)) + (atten.z * (d * d)));
+        attenMod = 1 / ((atten.x + (atten.y * d)) + (atten.z * (d * d)));
 	
-            lightVector = normalize(position.xyz - input.worldPosition);
+        lightVector = normalize(position.xyz - input.worldPosition);
 	
-            float4 finalDif;
+        float4 finalDif;
 	
-                    //calculate lighting for point light                                    //add directional light
-            finalDif = (calculateLighting(lightVector, input.normal, diffuse[1]) * attenMod) + (calculateLighting(lightDirection, input.normal, diffuse[0]));
+                //calculate lighting for point light                                    //add directional light
+        finalDif = (calculateLighting(lightVector, input.normal, diffuse[1]) * attenMod) + (calculateLighting(lightDirection, input.normal, diffuse[0]));
 	
-            lightColour = ambient[0] + ambient[1] + finalDif;
+        lightColour = ambient[0] + ambient[1] + finalDif;
         
-        //}
-    //    break;
-//    }
+
     
     return lightColour * textureColour;
 
 }
 
-//float4 main(InputType input) : SV_TARGET
-//{
-//	// Sample the texture. Calculate light intensity and colour, return light*texture for final pixel colour.
-//    float4 textureColour = texture0.Sample(sampler0, input.tex);
-	
-//    float d[2]; //array of distances from source to pixel -hh
-//    float attenMod[2]; //"" attenuation modifiers -hh
-//    float3 lightVector[2]; //"" normalized light vectors -hh
-	
-//    d[0] = length(position[0].xyz - input.worldPosition);
-//    d[1] = length(position[1].xyz - input.worldPosition);
 
-//    attenMod[0] = 1 / ((atten[0].x + (atten[0].y * d[0])) + (atten[0].z * (d[0] * d[0])));
-//    attenMod[1] = 1 / ((atten[1].x + (atten[1].y * d[1])) + (atten[1].z * (d[1] * d[1])));
-
-	
-//    lightVector[0] = normalize(position[0].xyz - input.worldPosition);
-//    lightVector[1] = normalize(position[1].xyz - input.worldPosition);
-	
-//    float4 finalDif;
-	
-//    finalDif = (calculateLighting(lightVector[0], input.normal, diffuse[0]) * attenMod[0]) +
-//	(calculateLighting(lightVector[1], input.normal, diffuse[1]) * attenMod[1]);
-	
-//    float4 lightColour = ambient[0] + ambient[1] + finalDif;
-	
-//    return lightColour * textureColour;
-//}
 
 
 

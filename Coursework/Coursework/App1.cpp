@@ -26,6 +26,7 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	ground = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());	
 	shadowGround = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
 	pointLightSphere = new SphereMesh(renderer->getDevice(), renderer->getDeviceContext());
+	spotLightSphere = new SphereMesh(renderer->getDevice(), renderer->getDeviceContext());
 
 	groundShader = new verManipShader(renderer->getDevice(), hwnd);
 	textureShader = new texShader(renderer->getDevice(), hwnd);
@@ -72,6 +73,18 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	pointlight->setPosition(-33.0f, 15.0f, 15.0f);
 	pointlight->setAtten(0.5f, 0.25f, 0.0f);
 
+	spotlight = new myLight();
+	spotlight->setAmbientColour(0.0f, 0.0f, 0.0f, 1.0f);
+	spotlight->setDiffuseColour(0.0f, 0.0f, 1.0f, 1.0f);
+	spotlight->setPosition(-33.0f, 105.0f, 25.0f);
+	spotlight->setAtten(0.5f, 0.25f, 0.0f);
+	spotlight->setDirection(0.0f, 1.0f, 0.0f);
+	spotlight->setSpecularColour(1.0f, 1.0f, 1.0f, 1.0f);
+	spotlight->setSpecularPower(0.5f);
+	spotlight->setCone(1.0f);
+	spotlight->setRange(100.0f);
+
+
 	pos = pointlight->getPosition();
 	ambi = pointlight->getAmbientColour();
 	attenu = pointlight->getAtten();
@@ -81,6 +94,16 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	direction = skylight->getDirection();
 	skyAmbi = skylight->getAmbientColour();
 	skyPos = skylight->getPosition();
+
+	spotAmbi = spotlight->getAmbientColour();
+	spotDiffuse = spotlight->getDiffuseColour();
+	spotDirection = spotlight->getDirection();
+	spotPos = spotlight->getPosition();
+	specularColour = spotlight->getSpecularColour();
+	specularPower = spotlight->getSpecularPower();
+	spotAttenu = spotlight->getAtten();
+	spotRange = spotlight->getRange();
+	spotCone = spotlight->getCone();
 }
 
 
@@ -106,6 +129,12 @@ App1::~App1()
 	{
 		delete pointLightSphere;
 		pointLightSphere = 0;
+	}	
+	
+	if (spotLightSphere)
+	{
+		delete spotLightSphere;
+		spotLightSphere = 0;
 	}
 
 	if (renderTexture)
@@ -142,6 +171,12 @@ App1::~App1()
 	{
 		delete  pointlight;
 		pointlight = 0;
+	}	
+	
+	if (spotlight)
+	{
+		delete  spotlight;
+		spotlight = 0;
 	}
 
 	for (int i = 0; i < 3; i++)
@@ -227,7 +262,17 @@ bool App1::render()
 	skylight->setDirection(direction.x, direction.y, direction.z);
 	skylight->setDiffuseColour(skydiffuse.w, skydiffuse.x, skydiffuse.y, skydiffuse.z);
 	skylight->setAmbientColour(skyAmbi.w, skyAmbi.x, skyAmbi.y, skyAmbi.z);
-	skylight->setPosition(skyPos.x, skyPos.y, skyPos.z);
+	skylight->setPosition(skyPos.x, skyPos.y, skyPos.z);	
+	
+	spotlight->setDirection(spotDirection.x, spotDirection.y, spotDirection.z);
+	spotlight->setDiffuseColour(spotDiffuse.w, spotDiffuse.x, spotDiffuse.y, spotDiffuse.z);
+	spotlight->setAmbientColour(spotAmbi.w, spotAmbi.x, spotAmbi.y, spotAmbi.z);
+	spotlight->setPosition(spotPos.x, spotPos.y, spotPos.z);
+	spotlight->setSpecularColour(specularColour.w, specularColour.x, specularColour.y, specularColour.z);
+	spotlight->setSpecularPower(specularPower);
+	spotlight->setAtten(spotAttenu.x, spotAttenu.y, spotAttenu.z);
+	spotlight->setRange(spotRange);
+	spotlight->setCone(spotCone);
 
 	renderer->beginScene(0.39f, 0.58f, 0.92f, 1.0f);
 	camera->update();
@@ -280,19 +325,19 @@ void App1::firstRender()
 
 	worldMatrix = XMMatrixTranslation(-30, 5, 30);
 	model[0]->sendData(renderer->getDeviceContext());
-	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight);
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight);
 	lightShader->render(renderer->getDeviceContext(), model[0]->getIndexCount());
 	worldMatrix = XMMatrixTranslation(30, -5, -30);
 
 	worldMatrix = XMMatrixTranslation(-40, 5, 20);
 	model[1]->sendData(renderer->getDeviceContext());
-	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight);
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight);
 	lightShader->render(renderer->getDeviceContext(), model[1]->getIndexCount());
 	worldMatrix = XMMatrixTranslation(40, 5, -20);
 
 	worldMatrix = XMMatrixTranslation(-20, 5, 10);
 	model[2]->sendData(renderer->getDeviceContext());
-	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight);
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight);
 	lightShader->render(renderer->getDeviceContext(), model[2]->getIndexCount());
 	worldMatrix = XMMatrixTranslation(20, -5, -10);
 
@@ -309,92 +354,19 @@ void App1::firstRender()
 	{
 		worldMatrix = XMMatrixTranslation(pointlight->getPosition().x, pointlight->getPosition().y, pointlight->getPosition().z);
 		pointLightSphere->sendData(renderer->getDeviceContext());
-		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight, skylight);
-		lightShader->render(renderer->getDeviceContext(), pointLightSphere->getIndexCount());
+		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight, skylight, spotlight);
+		lightShader->render(renderer->getDeviceContext(), pointLightSphere->getIndexCount());		worldMatrix = XMMatrixTranslation(pointlight->getPosition().x, pointlight->getPosition().y, pointlight->getPosition().z);
+		
+		worldMatrix = XMMatrixTranslation(spotlight->getPosition().x, spotlight->getPosition().y, spotlight->getPosition().z);
+		spotLightSphere->sendData(renderer->getDeviceContext());
+		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight, skylight,spotlight);
+		lightShader->render(renderer->getDeviceContext(), spotLightSphere->getIndexCount());
 	}
 
 	// Present the rendered scene to the screen.
 	renderer->setBackBufferRenderTarget();
 
 }
-
-//void App1::firstRender()
-//{
-//	//renderTexture->setRenderTarget(renderer->getDeviceContext());
-//	//renderTexture->clearRenderTarget(renderer->getDeviceContext(), 1.0f, 0.0f, 0.0f, 1.0f);
-//	renderer->beginScene(0.39f, 0.58f, 0.92f, 1.0f);
-//	camera->update();
-//
-//	//skylight->generateViewMatrix();
-//	XMMATRIX worldMatrix = renderer->getWorldMatrix();
-//	XMMATRIX viewMatrix = camera->getViewMatrix();
-//	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
-//
-//	model[0]->sendData(renderer->getDeviceContext());
-//	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), shadowMap->getDepthMapSRV(), skylight);
-//	shadowShader->render(renderer->getDeviceContext(), model[0]->getIndexCount());
-//
-//	renderer->setBackBufferRenderTarget();
-//
-//	renderer->setZBuffer(false);
-//
-//	XMMATRIX orthoMatrix = renderer->getOrthoMatrix();
-//	XMMATRIX orthoViewMatrix = camera->getOrthoViewMatrix();
-//
-//	orthomesh->sendData(renderer->getDeviceContext());
-//
-//	textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, shadowMap->getDepthMapSRV());
-//	textureShader->render(renderer->getDeviceContext(), orthomesh->getIndexCount());
-//
-//	renderer->setZBuffer(true);
-//
-//	gui();
-//	renderer->endScene();
-//}
-
-//void App1::scndRender()
-//{
-//	// Get matrices
-//	camera->update();
-//	XMMATRIX worldMatrix = renderer->getWorldMatrix();
-//	XMMATRIX viewMatrix = camera->getViewMatrix();
-//	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
-//
-//	// Render normal scene, with light shader set.
-//	
-//	//ground->sendData(renderer->getDeviceContext());
-//	//groundShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"myHeightMap")); // , textureMgr->getTexture(L"snowTexture"), skylight);
-//	//groundShader->render(renderer->getDeviceContext(), ground->getIndexCount());
-//
-//	//greyShader1->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"bunny"), light, input->getMouseX(), input->getMouseY());
-//	//greyShader1->render(renderer->getDeviceContext(), cubeMesh->getIndexCount());
-//
-//	renderer->setBackBufferRenderTarget();
-//
-//	renderer->beginScene(0.39f, 0.58f, 0.92f, 1.0f);
-//
-//	// RENDER THE RENDER TEXTURE SCENE
-//	// Requires 2D rendering and an ortho mesh.
-//	renderer->setZBuffer(false);
-//
-//	XMMATRIX orthoMatrix = renderer->getOrthoMatrix();  // ortho matrix for 2D rendering
-//	XMMATRIX orthoViewMatrix = camera->getOrthoViewMatrix();	// Default camera position for orthographic rendering
-//
-//	orthomesh->sendData(renderer->getDeviceContext());
-//
-//	textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, renderTexture->getShaderResourceView());
-//	textureShader->render(renderer->getDeviceContext(), orthomesh->getIndexCount());
-//
-//	renderer->setZBuffer(true);
-//
-//	// Render GUI
-//	gui();
-//
-//	//renderer->wo
-//
-//	// Present the rendered scene to the screen.
-//	renderer->endScene();
-//}
 
 void App1::depthRender()
 {
@@ -471,7 +443,7 @@ void App1::scndRender()
 	//shadowShader->render(renderer->getDeviceContext(), shadowGround->getIndexCount());
 
 	ground->sendData(renderer->getDeviceContext());
-	groundShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"myHeightMap"), textureMgr->getTexture(L"snowTexture"), shadowMap->getDepthMapSRV(), skylight, pointlight, showNorms);
+	groundShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"myHeightMap"), textureMgr->getTexture(L"snowTexture"), shadowMap->getDepthMapSRV(), skylight, pointlight, spotlight ,showNorms);
 	groundShader->render(renderer->getDeviceContext(), ground->getIndexCount());
 
 	XMMATRIX scaleMatrix = XMMatrixScaling(2.0f, 1.0f, 2.0f);
@@ -630,11 +602,78 @@ void App1::gui()
 		skydiffuse = XMFLOAT4(0.1f, 0.1f, 0.2f, 0.1f);
 		skyAmbi = XMFLOAT4(0.0f, 0.1f, 0.0f, 0.1f);
 		skyPos = XMFLOAT3(0.0f, 20.0f, 0.0f);
+
+		spotAmbi = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		spotDiffuse = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+		spotDirection = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		spotPos = XMFLOAT3(-33.0f, 105.0f, 25.0f);
+		specularColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		specularPower = 0.5f;
+		spotAttenu = XMFLOAT3(0.5f, 0.25f, 0.0f);
+		spotCone = 1.0f;
+		spotRange = 100.0f;
+
 		renderSphere = true;
 		edgeEnabled = true;
 		showNorms = false;
 	}
 
+	if (ImGui::CollapsingHeader("Spot light controls"))
+	{
+		ImGui::Indent(10);
+		ImGui::Checkbox("Show Light Source", &renderSphere);
+		if (ImGui::CollapsingHeader("Position_"))
+		{
+			ImGui::SliderFloat("x pos", &spotPos.x, -100.0f, 100.0f);
+			ImGui::SliderFloat("y pos", &spotPos.y, -100.0f, 100.0f);
+			ImGui::SliderFloat("z pos", &spotPos.z, -100.0f, 100.0f);
+		}
+
+		if (ImGui::CollapsingHeader("Direction_"))
+		{
+			ImGui::SliderFloat("x pos", &spotDirection.x, -100.0f, 100.0f);
+			ImGui::SliderFloat("y pos", &spotDirection.y, -100.0f, 100.0f);
+			ImGui::SliderFloat("z pos", &spotDirection.z, -100.0f, 100.0f);
+			ImGui::SliderFloat("Range", &spotRange, 0.0f, 200.0f);
+			ImGui::SliderFloat("Cone", &spotCone, 0.0f, 10.0f);
+		}
+
+		if (ImGui::CollapsingHeader("Attenuation_"))
+		{
+			ImGui::SliderFloat("Attenuation x", &spotAttenu.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("Attenuation y", &spotAttenu.y, 0.0f, 1.0f);
+			ImGui::SliderFloat("Attenuation z", &spotAttenu.z, 0.0f, 1.0f);
+		}
+
+		if (ImGui::CollapsingHeader("Diffuse Colour_"))
+		{
+
+			ImGui::SliderFloat("Red", &spotDiffuse.w, 0.0f, 1.0f);
+			ImGui::SliderFloat("Blue", &spotDiffuse.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("Green", &spotDiffuse.y, 0.0f, 1.0f);
+			ImGui::SliderFloat("Alpha", &spotDiffuse.z, 0.0f, 1.0f);
+		}		
+		
+		if (ImGui::CollapsingHeader("Specular Diffuse Colour_"))
+		{
+
+			ImGui::SliderFloat("Red", &specularColour.w, 0.0f, 1.0f);
+			ImGui::SliderFloat("Blue", &specularColour.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("Green", &specularColour.y, 0.0f, 1.0f);
+			ImGui::SliderFloat("Alpha", &specularColour.z, 0.0f, 1.0f);
+			ImGui::SliderFloat("Specular Power", &specularPower, 0.0f, 1.0f);
+		}
+
+		if (ImGui::CollapsingHeader("Ambient Colour_"))
+		{
+			ImGui::SliderFloat("Ambient Red", &spotAmbi.w, 0.0f, 1.0f);
+			ImGui::SliderFloat("Ambient Green", &spotAmbi.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("Ambient Blue", &spotAmbi.y, 0.0f, 1.0f);
+			ImGui::SliderFloat("Ambient Alpha", &spotAmbi.z, 0.0f, 1.0f);
+		}
+
+		ImGui::Indent(-10);
+	}
 
 	if (ImGui::CollapsingHeader("Point light controls"))
 	{

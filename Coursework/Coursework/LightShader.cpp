@@ -90,7 +90,7 @@ void LightShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilenam
 }
 
 
-void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* texture, myLight* light, myLight* skylight)
+void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* texture, myLight* light, myLight* skylight, myLight* spotlight)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -116,37 +116,33 @@ void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const 
 	LightBufferType* lightPtr;
 	deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	lightPtr = (LightBufferType*)mappedResource.pData;
-	//lightPtr->ambient[0] = light[0]->getAmbientColour();
-	//lightPtr->ambient[1] = light[1]->getAmbientColour();
 
-	lightPtr->diffuse[0] = skylight->getDiffuseColour();
-	//lightPtr->diffuse[1] = light[1]->getDiffuseColour();
-
-	//lightPtr->position[0] = light[0]->getPosition();
-	//lightPtr->position[1] = light[1]->getPosition();
-
-	////lightPtr->padding = 0.0f;
-	//lightPtr->atten[0] = light[0]->getAtten();
-	//lightPtr->atten[1] = light[1]->getAtten();	
-	
-	lightPtr->direction = skylight->getDirection();
+	lightPtr->direction[0] = skylight->getDirection();
+	lightPtr->direction[1] = spotlight->getDirection();
 
 	lightPtr->ambient[0] = light->getAmbientColour();
-	lightPtr->ambient[0] = skylight->getAmbientColour();
+	lightPtr->ambient[1] = skylight->getAmbientColour();
+	lightPtr->ambient[2] = spotlight->getAmbientColour();
 
+	lightPtr->diffuse[0] = light->getDiffuseColour();
+	lightPtr->diffuse[1] = skylight->getDiffuseColour();
+	lightPtr->diffuse[2] = spotlight->getDiffuseColour();
 
-	lightPtr->diffuse[1] = light->getDiffuseColour();
+	lightPtr->position[0] = light->getPosition();
+	lightPtr->position[1] = skylight->getPosition();
+	lightPtr->position[2] = spotlight->getPosition();
 
-	lightPtr->position = light->getPosition();
+	lightPtr->atten[0] = light->getAtten();
+	lightPtr->atten[1] = spotlight->getAtten();
 
-	lightPtr->pad = 0.0f;
-	lightPtr->pad1 = 0.0f;
-	lightPtr->pad2 = 0.0f;
-	lightPtr->atten = light->getAtten();
+	lightPtr->specPower = spotlight->getSpecularPower();
+	lightPtr->specDiffuse = spotlight->getSpecularColour();
+	lightPtr->range = spotlight->getRange();
+	lightPtr->cone = spotlight->getCone();
 
-	//lightPtr->type = light->getType();
-
-
+	//lightPtr->pad1[0] = 0.0f;
+	//lightPtr->pad1[1] = 0.0f;
+	//lightPtr->pad1[2] = 0.0f;
 
 	deviceContext->Unmap(lightBuffer, 0);
 	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);

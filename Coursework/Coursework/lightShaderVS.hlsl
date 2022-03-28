@@ -1,7 +1,4 @@
-float4 main( float4 pos : POSITION ) : SV_POSITION
-{
-	return pos;
-} // Light vertex shader
+// Light vertex shader
 // Standard issue vertex shader, apply matrices, pass info to pixel shader
 cbuffer MatrixBuffer : register(b0)
 {

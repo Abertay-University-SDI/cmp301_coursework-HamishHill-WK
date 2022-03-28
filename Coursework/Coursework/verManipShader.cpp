@@ -35,6 +35,12 @@ verManipShader::~verManipShader()
 		lightBuffer->Release();
 		lightBuffer = 0;
 	}
+		
+	if (spotlightBuffer)
+	{
+		spotlightBuffer->Release();
+		spotlightBuffer = 0;
+	}
 
 	//Release base shader components
 	BaseShader::~BaseShader();
@@ -44,7 +50,8 @@ void verManipShader::initShader(const wchar_t* vsFilename, const wchar_t* psFile
 {
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	D3D11_SAMPLER_DESC samplerDesc;
-	D3D11_BUFFER_DESC lightBufferDesc;
+	D3D11_BUFFER_DESC lightBufferDesc;	
+	D3D11_BUFFER_DESC spotlightBufferDesc;
 	//D3D11_BUFFER_DESC timeBufferDesc;
 
 	// Load (+ compile) shader files
@@ -110,12 +117,20 @@ void verManipShader::initShader(const wchar_t* vsFilename, const wchar_t* psFile
 	lightBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	lightBufferDesc.MiscFlags = 0;
 	lightBufferDesc.StructureByteStride = 0;
-	renderer->CreateBuffer(&lightBufferDesc, NULL, &lightBuffer);
+	renderer->CreateBuffer(&lightBufferDesc, NULL, &lightBuffer);	
+	
+	spotlightBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	spotlightBufferDesc.ByteWidth = sizeof(LightBufferType);
+	spotlightBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	spotlightBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	spotlightBufferDesc.MiscFlags = 0;
+	spotlightBufferDesc.StructureByteStride = 0;
+	renderer->CreateBuffer(&spotlightBufferDesc, NULL, &spotlightBuffer);
 
 }
 
 
-void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* heightTex, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* depthMap, myLight* skylight, myLight* pointlight, bool normals)
+void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* heightTex, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* depthMap, myLight* skylight, myLight* pointlight, myLight* spotlight, bool normals)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -149,46 +164,55 @@ void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, con
 	LightBufferType* lightPtr;
 	deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	lightPtr = (LightBufferType*)mappedResource.pData;
+		
+	spotLightBuffer* spotlightPtr;
+	deviceContext->Map(spotlightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	spotlightPtr = (spotLightBuffer*)mappedResource.pData;
+
+
+	lightPtr->norms = (int)normals;
+
 
 	lightPtr->direction = skylight->getDirection();
-//	lightPtr->direction[1] = pointlight->getDirection();
-//	lightPtr->pad = XMFLOAT2(0.0f, 0.0f);
-	lightPtr->ambient[0] = pointlight->getAmbientColour();	
-	lightPtr->ambient[1] = skylight->getAmbientColour();
+	spotlightPtr->spotDirection = spotlight->getDirection();
 
-	lightPtr->diffuse[0] = skylight->getDiffuseColour();
-	lightPtr->diffuse[1] = pointlight->getDiffuseColour();
-//	lightPtr->diffuse = XMFLOAT4(0, 0, 0, 0);
-//	lightPtr->position[0] = XMFLOAT3(0, 0, 0);
+	lightPtr->ambient = pointlight->getAmbientColour();
+	lightPtr->skyAmbient = skylight->getAmbientColour();
+	spotlightPtr->spotAmbient = spotlight->getAmbientColour();
+
+	lightPtr->diffuse = pointlight->getDiffuseColour();
+	lightPtr->skyDiffuse = skylight->getDiffuseColour();
+	spotlightPtr->spotDiffuse = spotlight->getDiffuseColour();
+
 	lightPtr->position = pointlight->getPosition();
-//	lightPtr->pad1 = XMFLOAT2(0.0f, 0.0f);
+	lightPtr->skypos = skylight->getPosition();
+	spotlightPtr->spotPosition = spotlight->getPosition();
+
 	lightPtr->atten = pointlight->getAtten();
-	lightPtr->norms = normals;// XMFLOAT2(0.0f, 0.0f);
-	//	lightPtr->direction[0] = skylight->getDirection();
-	//lightPtr->direction[1] = pointlight->getDirection();
-	//lightPtr->pad = XMFLOAT2(0.0f, 0.0f);
-	//lightPtr->ambient = pointlight->getAmbientColour();
-	//lightPtr->diffuse[0] = skylight->getDiffuseColour();
-	//lightPtr->diffuse[1] = pointlight->getDiffuseColour();
-	//lightPtr->diffuse[2] = XMFLOAT4(0, 0, 0, 0);
-	//lightPtr->position[0] = XMFLOAT3(0, 0, 0);
-	//lightPtr->position[1] = pointlight->getPosition();
-	//lightPtr->pad1 = XMFLOAT2(0.0f, 0.0f);
-	//lightPtr->atten = pointlight->getAtten();
-	//lightPtr->pad2 = 0.0f;// XMFLOAT2(0.0f, 0.0f);
+	spotlightPtr->spotAtten = spotlight->getAtten();
+
+	spotlightPtr->specPower = spotlight->getSpecularPower();
+	spotlightPtr->specDiffuse = spotlight->getSpecularColour();
+	spotlightPtr->range = spotlight->getRange();
+	spotlightPtr->cone = spotlight->getCone();
+
+	//lightPtr->pad1[0] = 0.0f;
+	//lightPtr->pad1[1] = 0.0f;
+	//lightPtr->pad1[2] = 0.0f;
 
 
 	//->type[2] = pointlight->getType();
 
 
 	deviceContext->Unmap(lightBuffer, 0);
-	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);
+	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);	
+	
+	deviceContext->Unmap(spotlightBuffer, 0);
+	deviceContext->PSSetConstantBuffers(1, 1, &spotlightBuffer);
 
 	 //Set shader texture resource in the pixel shader.
 	deviceContext->PSSetShaderResources(0, 1, &texture);
 	deviceContext->PSSetSamplers(0, 1, &sampleState);	
 	deviceContext->PSSetShaderResources(1, 1, &depthMap);
 	deviceContext->PSSetSamplers(1, 1, &sampleStateShadow);
-
-
 }
