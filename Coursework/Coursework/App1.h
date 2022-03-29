@@ -29,13 +29,15 @@ protected:
 	bool render();
 	void gui();
 
-	XMFLOAT3 treePos1;
+	XMFLOAT3 treePos1 = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 treePos2;
 	XMFLOAT3 treePos3;	
+	XMFLOAT3 groundPos;	
 
-	XMFLOAT3 treePos1Def = XMFLOAT3(-30,5,30);
+	XMFLOAT3 treePos1Def = XMFLOAT3(-30, 5, 30);
 	XMFLOAT3 treePos2Def = XMFLOAT3(-40, 5, 20);
-	XMFLOAT3 treePos3Def =XMFLOAT3(-20, 5, 10);
+	XMFLOAT3 treePos3Def =XMFLOAT3(-20, 5, 10);	
+	XMFLOAT3 groundPosDef =XMFLOAT3(-115, 5, 10);
 
 	//modifiable lighting values for imgui
 	//point light variables
@@ -67,15 +69,15 @@ protected:
 
 	//default values for modifiable variables
 	//point
-	XMFLOAT3 posDef = XMFLOAT3(-33.0f, 15.0f, 15.0f);
+	XMFLOAT3 posDef = XMFLOAT3(-65.0f, 15.0f, 55.0f);
 	XMFLOAT4 pointdiffuseDef = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	XMFLOAT4 ambiDef = XMFLOAT4(0.1f, 0.1f, 0.0f, 0.1f);;
 	XMFLOAT3 attenuDef = XMFLOAT3(0.5f, 0.25f, 0.0f);
 
 	//sky
-	XMFLOAT4 skydiffuseDef = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	XMFLOAT4 skydiffuseDef = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	XMFLOAT4 skyAmbiDef = XMFLOAT4(0.0f, 0.0f, 0.1f, 0.1f);
-	XMFLOAT3 skyPosDef = XMFLOAT3(-5.0f, 20.0f, 0.0f);
+	XMFLOAT3 skyPosDef = XMFLOAT3(-5.0f, 40.0f, 0.0f);
 	XMFLOAT3 directionDef = XMFLOAT3(-1.0f, -0.7f, 0.8f);
 
 	//spot
@@ -100,17 +102,17 @@ protected:
 	void finalPass();
 
 private:
-	verManipShader* groundShader;
-	texShader* textureShader;
-	LightShader* lightShader;
-	DepthShader* depthShader;
-	ShadowShader* shadowShader;
-	verEdgeShader* verEdgeShader1;
-	horEdgeShader* horEdgeShader1;
+	verManipShader* groundShader = 0;
+	texShader* textureShader = 0;
+	LightShader* lightShader = 0;
+	DepthShader* depthShader = 0;
+	ShadowShader* shadowShader =0;
+	verEdgeShader* verEdgeShader1 =0;
+	horEdgeShader* horEdgeShader1 =0;
 
-	PlaneMesh* ground;
-	PlaneMesh* shadowGround;
-	AModel* model[4];
+	PlaneMesh* ground = 0;
+	PlaneMesh* shadowGround =0 ;
+	AModel* model[4] = { 0,0,0,0 };
 
 	SphereMesh* pointLightSphere;
 	SphereMesh* spotLightSphere;

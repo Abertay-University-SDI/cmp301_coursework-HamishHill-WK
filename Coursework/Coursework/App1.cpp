@@ -107,6 +107,7 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	treePos1 = treePos1Def;
 	treePos2 = treePos2Def;
 	treePos3 = treePos3Def;
+	groundPos = groundPosDef;
 }
 
 
@@ -290,7 +291,7 @@ bool App1::render()
 
 	if (edgeEnabled)
 	{
-		horizontalEdge();
+		//horizontalEdge();	//edge detection post process originally required two shaders and renders but it now works in just one.
 
 		verticalEdge();
 	}
@@ -309,9 +310,6 @@ void App1::firstRender()
 {
 	renderTexture->setRenderTarget(renderer->getDeviceContext());
 	renderTexture->clearRenderTarget(renderer->getDeviceContext(), 1.0f, 0.0f, 0.0f, 1.0f);
-
-	// Generate the view matrix based on the camera's position.
-//	camera->update();
 
 	// Get the world, view, projection, and ortho matrices from the camera and Direct3D objects.
 	XMMATRIX worldMatrix = renderer->getWorldMatrix();
@@ -366,12 +364,12 @@ void App1::depthRender()
 	XMMATRIX lightProjectionMatrix = skylight->getOrthoMatrix();
 	XMMATRIX worldMatrix = renderer->getWorldMatrix();
 
-	worldMatrix = XMMatrixTranslation(-115, 5, 10);
+	worldMatrix = XMMatrixTranslation(groundPos.x, groundPos.y, groundPos.z);
 	ground->sendData(renderer->getDeviceContext());
 	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
 	depthShader->render(renderer->getDeviceContext(), ground->getIndexCount());
-	worldMatrix = XMMatrixTranslation(115, -5, -10);
-
+	worldMatrix = XMMatrixTranslation(-groundPos.x, -groundPos.y, -groundPos.z);
+	
 	worldMatrix = XMMatrixTranslation(treePos1.x, treePos1.y, treePos1.z);
 	model[0]->sendData(renderer->getDeviceContext());
 	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
@@ -404,11 +402,11 @@ void App1::scndRender()
 	XMMATRIX viewMatrix = camera->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
-	worldMatrix = XMMatrixTranslation(-115, 0, 10);
+	worldMatrix = XMMatrixTranslation(groundPos.x, groundPos.y, groundPos.z);
 	ground->sendData(renderer->getDeviceContext());
 	groundShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"myHeightMap"), textureMgr->getTexture(L"snowTexture"), shadowMap->getDepthMapSRV(), skylight, pointlight, spotlight ,showNorms);
 	groundShader->render(renderer->getDeviceContext(), ground->getIndexCount());
-	worldMatrix = XMMatrixTranslation(115, 0, -10);
+	worldMatrix = XMMatrixTranslation(-groundPos.x, -groundPos.y, -groundPos.z);
 
 	worldMatrix = XMMatrixTranslation(treePos1.x, treePos1.y, treePos1.z);
 	model[0]->sendData(renderer->getDeviceContext());
@@ -482,7 +480,7 @@ void App1::verticalEdge()
 	// Render for Vertical Blur
 	renderer->setZBuffer(false);
 	orthomesh->sendData(renderer->getDeviceContext());
-	verEdgeShader1->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, horizEdgeTexture->getShaderResourceView(), screenSizeY, screenSizeX);
+	verEdgeShader1->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, renderTexture->getShaderResourceView(), screenSizeY, screenSizeX);
 	verEdgeShader1->render(renderer->getDeviceContext(), orthomesh->getIndexCount());
 	renderer->setZBuffer(true);
 
@@ -566,6 +564,12 @@ void App1::gui()
 		spotCone = spotConeDef;
 		spotRange = spotRangeDef;
 
+		//object positions
+		treePos1 = treePos1Def;
+		treePos2 = treePos2Def;
+		treePos3 = treePos3Def;
+		groundPos = groundPosDef;
+
 		renderSphere = false;
 		edgeEnabled = true;
 		showNorms = false;
@@ -585,9 +589,9 @@ void App1::gui()
 
 		if (ImGui::CollapsingHeader("Spot Direction_"))
 		{
-			ImGui::SliderFloat("Spot x direction", &spotDirection.x, -100.0f, 100.0f);
-			ImGui::SliderFloat("Spot y direction", &spotDirection.y, -100.0f, 100.0f);
-			ImGui::SliderFloat("Spot z direction", &spotDirection.z, -100.0f, 100.0f);
+			ImGui::SliderFloat("Spot x direction", &spotDirection.x, -1.0f, 1.0f);
+			ImGui::SliderFloat("Spot y direction", &spotDirection.y, -1.0f, 1.0f);
+			ImGui::SliderFloat("Spot z direction", &spotDirection.z, -1.0f, 1.0f);
 			ImGui::SliderFloat("Spot Range", &spotRange, 0.0f, 200.0f);
 			ImGui::SliderFloat("Spot Cone", &spotCone, 0.0f, 10.0f);
 		}
@@ -698,6 +702,40 @@ void App1::gui()
 			ImGui::SliderFloat("Sky Ambient Blue ", &skyAmbi.y, 0.0f, 1.0f);
 			ImGui::SliderFloat("Sky Ambient Alpha ", &skyAmbi.z, 0.0f, 1.0f);
 		}
+		ImGui::Indent(-10);
+	}
+
+	if (ImGui::CollapsingHeader("Object positions"))
+	{
+		ImGui::Indent(10);
+		if (ImGui::CollapsingHeader("Tree 1 Position"))
+		{
+			ImGui::SliderFloat("Tree1 x pos", &treePos1.x, -100.0f, 100.0f);
+			ImGui::SliderFloat("Tree1 y pos", &treePos1.y, -100.0f, 100.0f);
+			ImGui::SliderFloat("Tree1 z pos", &treePos1.z, -100.0f, 100.0f);
+		}		
+		
+		if (ImGui::CollapsingHeader("Tree 2 Position"))
+		{
+			ImGui::SliderFloat("Tree2 x pos", &treePos2.x, -100.0f, 100.0f);
+			ImGui::SliderFloat("Tree2 y pos", &treePos2.y, -100.0f, 100.0f);
+			ImGui::SliderFloat("Tree2 z pos", &treePos2.z, -100.0f, 100.0f);
+		}		
+		
+		if (ImGui::CollapsingHeader("Tree 3 Position"))
+		{
+			ImGui::SliderFloat("Tree3 x pos", &treePos3.x, -100.0f, 100.0f);
+			ImGui::SliderFloat("Tree3 y pos", &treePos3.y, -100.0f, 100.0f);
+			ImGui::SliderFloat("Tree3 z pos", &treePos3.z, -100.0f, 100.0f);
+		}		
+		
+		if (ImGui::CollapsingHeader("Ground Position"))
+		{
+			ImGui::SliderFloat("Ground x pos", &groundPos.x, -100.0f, 100.0f);
+			ImGui::SliderFloat("Ground y pos", &groundPos.y, -100.0f, 100.0f);
+			ImGui::SliderFloat("Ground z pos", &groundPos.z, -100.0f, 100.0f);
+		}
+
 		ImGui::Indent(-10);
 	}
 
