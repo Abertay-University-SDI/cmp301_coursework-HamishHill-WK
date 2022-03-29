@@ -9,10 +9,16 @@ cbuffer LightBuffer : register(b0)
 {
     float3 direction;
     int norms;
+    
     float3 position;
+    float pad;
+    
     float3 skypos;
+    float pad1;
+    
     float3 atten;
-    float3 pad;
+    float pad2;
+    
     float4 ambient;
     float4 skyAmbient;
     float4 diffuse;
@@ -23,13 +29,13 @@ cbuffer spotLightBuffer : register(b1)
 {
     float3 spotDirection;
     float specPower;
-    float range;
-    float cone;
     float4 specDiffuse;
     float3 spotPosition;
+    float range;
     float4 spotAmbient;
     float4 spotDiffuse;
     float3 spotAtten;
+    float cone;
 };
 
 struct InputType
@@ -42,10 +48,10 @@ struct InputType
     float3 view : TEXCOORD3;
 };
 
-float4 calculateLighting(float3 lightDirection, float3 normal, float4 diffuse)
+float4 calculateLighting(float3 lightDirection, float3 normal, float4 diffuse1)
 {
-    float intensity = saturate(dot(normal, lightDirection));
-    float4 colour = saturate(diffuse * intensity);
+    float intensity1 = saturate(dot(normal, lightDirection));
+    float4 colour = saturate(diffuse1 * intensity1);
     return colour;
 }
 
@@ -84,18 +90,18 @@ float2 getProjectiveCoords(float4 lightViewPosition)
     return projTex;
 }
 
-float4 calcSpecular(float3 lightD, float3 norm, float3 view, float4 specCol, float specPowr)
+float4 calcSpecular(float3 lightD, float3 norm, float3 view1, float4 specCol, float specPowr)
 {
-    float3 halfway = normalize(lightD + view);
+    float3 halfway = normalize(lightD + view1);
     float specInt = pow(max(dot(norm, halfway), 0.0f), specPowr);
     return saturate(specCol * specInt);
 }
 
 float4 main(InputType input) : SV_TARGET
 {
-    if(norms)
+    if(norms == 1)
     {
-        float4 colour = float4(input.normal.x, input.normal.y, input.normal.z, 0.0f);
+        float4 colour = float4(input.normal.x, input.normal.y, input.normal.z, 1.0f);
         return colour;
     }
     
@@ -103,10 +109,8 @@ float4 main(InputType input) : SV_TARGET
     float alpha; //angle between light vector and light direction 
     float intensity; //multiplier between 0.0 and 1.0 to show if pixel is in cone
 
-    
     float4 textureColour;
     float shadowMapBias = 0.01f;
-   // float4 colour = float4(0.f, 0.f, 0.f, 1.f);
 
     textureColour = texture0.Sample(sampler0, (input.tex * 2));
     float2 pTexCoord = getProjectiveCoords(input.lightViewPos);
@@ -136,13 +140,6 @@ float4 main(InputType input) : SV_TARGET
         intensity = 0.0f;
     
     float4 finalDif = float4(0.f, 0.f, 0.f, 1.f);
-	
-  //  finalDif = /*(ambient + calculateLighting(-lightDirection[0], input.normal, diffuseColour[0])) +*/
-  //  (calculateLighting(lightVector, input.normal, diffuseColour[1]) * attenMod);    
-    
-    //finalDif = calculateLighting(-lightDirection, input.normal, diffuseColour[0]) +
-    //(calculateLighting(lightVector, input.normal, diffuseColour[1]) * attenMod) + ambient[0] + ambient[1];       
-    
     
     if (hasDepthData(pTexCoord))
     {
@@ -150,27 +147,31 @@ float4 main(InputType input) : SV_TARGET
         if (!isInShadow(depthMapTexture, pTexCoord, input.lightViewPos, shadowMapBias))
         {
             // is NOT in shadow, therefore light
-            finalDif =+ saturate(calculateLighting(-direction, input.normal, skyDiffuse));
+            finalDif = calculateLighting(-direction, input.normal, skyDiffuse);
         }        
             
-        if (isInShadow(depthMapTexture, pTexCoord, input.lightViewPos, shadowMapBias))
-        {
-            // is in shadow, therefore no light
-            finalDif = (0, 0, 0, 0);
-            return finalDif;
-        }
+        //if (isInShadow(depthMapTexture, pTexCoord, input.lightViewPos, shadowMapBias))
+        //{
+        //    // is in shadow, therefore no light
+        //    finalDif = (0, 0, 0, 0);
+        //    return finalDif;
+        //}
     }
     
-    finalDif = finalDif + (calculateLighting(lightVector, input.normal, diffuse) * attenMod) + ambient + skyAmbient ;
+    finalDif = finalDif + (calculateLighting(lightVector, input.normal, diffuse) * attenMod) + ambient + skyAmbient + spotAmbient;
        
-    if (spotD <= range)
+    if (spotD >= range)
     {
-        attenMod = 1 / ((spotAtten.x + (spotAtten.y * spotD)) + (spotAtten.z * (spotD  * spotD)));
+        return finalDif * textureColour;
+    }
+    else
+    {
+        attenMod = 1 / ((spotAtten.x + (spotAtten.y * spotD)) + (spotAtten.z * (spotD * spotD)));
 
         finalDif = finalDif + calcSpecular(spotLightVector, input.normal, input.view, specDiffuse, specPower) +
-        (calculateLighting(spotLightVector, input.normal,spotDiffuse) * attenMod * intensity) + spotAmbient;
-    }
+        (calculateLighting(spotLightVector, input.normal, spotDiffuse) * attenMod * intensity);
     
-    return saturate(finalDif * textureColour);
+        return finalDif * textureColour;
+    }
 }
 

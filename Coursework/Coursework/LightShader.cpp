@@ -84,13 +84,21 @@ void LightShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilenam
 	lightBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	lightBufferDesc.MiscFlags = 0;
 	lightBufferDesc.StructureByteStride = 0;
-	renderer->CreateBuffer(&lightBufferDesc, NULL, &lightBuffer);
+	renderer->CreateBuffer(&lightBufferDesc, NULL, &lightBuffer);	
+	
+	lightBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	lightBufferDesc.ByteWidth = sizeof(LightBufferType);
+	lightBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	lightBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	lightBufferDesc.MiscFlags = 0;
+	lightBufferDesc.StructureByteStride = 0;
+	renderer->CreateBuffer(&lightBufferDesc, NULL, &spotlightBuffer);
 
 
 }
 
 
-void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* texture, myLight* light, myLight* skylight, myLight* spotlight)
+void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* texture, myLight* light, myLight* skylight, myLight* spotlight, bool normals)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -115,37 +123,45 @@ void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const 
 	// Send light data to pixel shader
 	LightBufferType* lightPtr;
 	deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	lightPtr = (LightBufferType*)mappedResource.pData;
+	lightPtr = (LightBufferType*)mappedResource.pData;	
+	
+	spotLightBuffer* spotlightPtr;
+	deviceContext->Map(spotlightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	spotlightPtr = (spotLightBuffer*)mappedResource.pData;
 
-	lightPtr->direction[0] = skylight->getDirection();
-	lightPtr->direction[1] = spotlight->getDirection();
+	lightPtr->norms = (int)normals;
+	lightPtr->direction = skylight->getDirection();
+	spotlightPtr->spotDirection = spotlight->getDirection();
 
-	lightPtr->ambient[0] = light->getAmbientColour();
-	lightPtr->ambient[1] = skylight->getAmbientColour();
-	lightPtr->ambient[2] = spotlight->getAmbientColour();
+	lightPtr->ambient = light->getAmbientColour();
+	lightPtr->skyAmbient = skylight->getAmbientColour();
+	spotlightPtr->spotAmbient = spotlight->getAmbientColour();
 
-	lightPtr->diffuse[0] = light->getDiffuseColour();
-	lightPtr->diffuse[1] = skylight->getDiffuseColour();
-	lightPtr->diffuse[2] = spotlight->getDiffuseColour();
+	lightPtr->diffuse = light->getDiffuseColour();
+	lightPtr->skyDiffuse = skylight->getDiffuseColour();
+	spotlightPtr->spotDiffuse = spotlight->getDiffuseColour();
 
-	lightPtr->position[0] = light->getPosition();
-	lightPtr->position[1] = skylight->getPosition();
-	lightPtr->position[2] = spotlight->getPosition();
+	lightPtr->position = light->getPosition();
+	lightPtr->skypos = skylight->getPosition();
+	spotlightPtr->spotPosition = spotlight->getPosition();
 
-	lightPtr->atten[0] = light->getAtten();
-	lightPtr->atten[1] = spotlight->getAtten();
+	lightPtr->atten = light->getAtten();
+	spotlightPtr->spotAtten = spotlight->getAtten();
 
-	lightPtr->specPower = spotlight->getSpecularPower();
-	lightPtr->specDiffuse = spotlight->getSpecularColour();
-	lightPtr->range = spotlight->getRange();
-	lightPtr->cone = spotlight->getCone();
+	spotlightPtr->specPower = spotlight->getSpecularPower();
+	spotlightPtr->specDiffuse = spotlight->getSpecularColour();
+	spotlightPtr->range = spotlight->getRange();
+	spotlightPtr->cone = spotlight->getCone();
 
 	//lightPtr->pad1[0] = 0.0f;
 	//lightPtr->pad1[1] = 0.0f;
 	//lightPtr->pad1[2] = 0.0f;
 
 	deviceContext->Unmap(lightBuffer, 0);
-	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);
+	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);	
+	
+	deviceContext->Unmap(spotlightBuffer, 0);
+	deviceContext->PSSetConstantBuffers(1, 1, &spotlightBuffer);
 
 	// Set shader texture resource in the pixel shader.
 	deviceContext->PSSetShaderResources(0, 1, &texture);

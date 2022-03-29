@@ -14,9 +14,11 @@ private:
 		XMFLOAT3 direction;
 		int norms;
 		XMFLOAT3 position;
+		float pad;
 		XMFLOAT3 skypos;
+		float pad1;
 		XMFLOAT3 atten;
-		XMFLOAT3 pad;
+		float pad2;
 		XMFLOAT4 ambient;
 		XMFLOAT4 skyAmbient;
 		XMFLOAT4 diffuse;
@@ -27,13 +29,13 @@ private:
 	{
 		XMFLOAT3 spotDirection;
 		float specPower;
-		float range;
-		float cone;
 		XMFLOAT4 specDiffuse;
 		XMFLOAT3 spotPosition;
+		float range;
 		XMFLOAT4 spotAmbient;
 		XMFLOAT4 spotDiffuse;
 		XMFLOAT3 spotAtten;
+		float cone;
 	};
 
 	struct MatrixBufferType

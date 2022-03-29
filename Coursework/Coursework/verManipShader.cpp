@@ -171,8 +171,6 @@ void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, con
 
 
 	lightPtr->norms = (int)normals;
-
-
 	lightPtr->direction = skylight->getDirection();
 	spotlightPtr->spotDirection = spotlight->getDirection();
 

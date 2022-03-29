@@ -44,7 +44,7 @@ float heightMap(float2 uv)
 float3 calcNormals(float2 UV)
 {
     float3 norm = float3(0.0f, 0.0f, 0.0f);
-    float d = 1.0f;
+    float d = 1;
 	
     float2 tanUV = float2(UV + float2(-d, 0.0f));
     float2 tan1UV = float2(UV + float2(d, 0.0f));
@@ -52,11 +52,11 @@ float3 calcNormals(float2 UV)
     float2 bi1UV = float2(UV + float2(0.0f, d));
     float thisUV = UV;
 	
-    float tanCol = (heightMap(tanUV) * 10);
-    float tanCol1 = (heightMap(tan1UV) * 10);
-    float biCol = (heightMap(biUV) * 10);
-    float biCol1 = (heightMap(bi1UV) * 10);
-    float thisCol = (heightMap(UV) * 10);
+    float tanCol = (heightMap(tanUV) * 20);
+    float tanCol1 = (heightMap(tan1UV) * 20);
+    float biCol = (heightMap(biUV) * 20);
+    float biCol1 = (heightMap(bi1UV) * 20);
+    float thisCol = (heightMap(UV) * 20);
 	
     float3 tangent = float3(-d, tanCol, 0.0f);
     float3 tangent1 = float3(d, tanCol1, 0.0f);
@@ -84,13 +84,8 @@ float3 calcNormals(float2 UV)
 OutputType main(InputType input)
 {
 	OutputType output;
-
-	//input.position.y = (padding.x * sin((padding.y * input.position.x) + (time * padding.z))); //+ padding.x * cos((padding.y * input.normal.z) + (time * padding.z)));
-
-	//input.normal = float3(padding.x * (-cos((padding.y * input.position.x) + (time * padding.z))), 1, 0);// +float3(padding.x * (-cos((padding.y * input.position.z) + (time * padding.z))), 1, 0);
-
-    input.position.y += heightMap(input.tex) * 10 ;
-
+    
+    input.position.y += heightMap(input.tex) * 20 ;
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
 	output.position = mul(input.position, worldMatrix);

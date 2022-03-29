@@ -29,31 +29,65 @@ protected:
 	bool render();
 	void gui();
 
+	XMFLOAT3 treePos1;
+	XMFLOAT3 treePos2;
+	XMFLOAT3 treePos3;	
+
+	XMFLOAT3 treePos1Def = XMFLOAT3(-30,5,30);
+	XMFLOAT3 treePos2Def = XMFLOAT3(-40, 5, 20);
+	XMFLOAT3 treePos3Def =XMFLOAT3(-20, 5, 10);
+
 	//modifiable lighting values for imgui
+	//point light variables
 	XMFLOAT3 pos;
-	XMFLOAT3 spotPos;
+	XMFLOAT4 pointdiffuse;	
+	XMFLOAT3 attenu;	
+	XMFLOAT4 ambi;	
+
+	//skylight variables
 	XMFLOAT3 skyPos;
 	XMFLOAT3 direction;	
-	XMFLOAT3 spotDirection;
-
 	XMFLOAT4 skydiffuse;
-	XMFLOAT4 pointdiffuse;	
-	XMFLOAT4 spotDiffuse;
-
-	XMFLOAT3 attenu;	
-	XMFLOAT3 spotAttenu;
-	XMFLOAT4 ambi;	
-	XMFLOAT4 spotAmbi;
 	XMFLOAT4 skyAmbi;
 
+	//spotlight variables
+	XMFLOAT3 spotDirection;
+	XMFLOAT4 spotDiffuse;
+	XMFLOAT3 spotPos;
+	XMFLOAT3 spotAttenu;
+	XMFLOAT4 spotAmbi;
 	XMFLOAT4 specularColour;
 	float specularPower;
 	float spotRange;
 	float spotCone;
 
-	bool renderSphere;
-	bool edgeEnabled;
-	bool showNorms;
+	bool renderSphere;	//variable to control rendering sphere objects at the position of light sources
+	bool edgeEnabled;	//variable to toggle post processing effect
+	bool showNorms;		//variable to toggle displaying vertex normals
+
+	//default values for modifiable variables
+	//point
+	XMFLOAT3 posDef = XMFLOAT3(-33.0f, 15.0f, 15.0f);
+	XMFLOAT4 pointdiffuseDef = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	XMFLOAT4 ambiDef = XMFLOAT4(0.1f, 0.1f, 0.0f, 0.1f);;
+	XMFLOAT3 attenuDef = XMFLOAT3(0.5f, 0.25f, 0.0f);
+
+	//sky
+	XMFLOAT4 skydiffuseDef = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	XMFLOAT4 skyAmbiDef = XMFLOAT4(0.0f, 0.0f, 0.1f, 0.1f);
+	XMFLOAT3 skyPosDef = XMFLOAT3(-5.0f, 20.0f, 0.0f);
+	XMFLOAT3 directionDef = XMFLOAT3(-1.0f, -0.7f, 0.8f);
+
+	//spot
+	XMFLOAT4 spotDiffuseDef = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);;
+	XMFLOAT3 spotAttenuDef = XMFLOAT3(0.2f, 0.05f, 0.0f);;
+	XMFLOAT3 spotPosDef = XMFLOAT3(-43.0f, 25.0f, 25.0f);
+	XMFLOAT3 spotDirectionDef = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	XMFLOAT4 spotAmbiDef = XMFLOAT4(0.0f, 0.0f, 0.1f, 0.1f);
+	XMFLOAT4 specularColourDef = XMFLOAT4(0.0f, 1.0f, 0.0f, 0.2f);
+	float specularPowerDef = 0.1f;
+	float spotRangeDef = 100.0f;
+	float spotConeDef = 1.0f;
 
 	void depthRender();
 	void firstRender();

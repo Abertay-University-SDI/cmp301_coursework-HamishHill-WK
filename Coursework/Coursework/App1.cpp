@@ -60,29 +60,28 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	skylight->generateOrthoMatrix((float)sceneWidth, (float)sceneHeight, 0.1f, 100.f);
 
 	//skylight->setType(0);
-	skylight->setDiffuseColour(0.1f, 0.1f, 0.2f, 0.1f);
-	skylight->setAmbientColour(0.0f, 0.0f, 0.1f, 0.1f);
-	skylight->setDirection(-1.0f, -0.7f, 0.8f);
-	skylight->setPosition(-5.0f, 20.0f, 0.0f);
-
+	skylight->setDiffuseColour(skydiffuseDef.w, skydiffuseDef.x, skydiffuseDef.y, skydiffuseDef.z);
+	skylight->setAmbientColour(skyAmbiDef.w, skyAmbiDef.x, skyAmbiDef.y, skyAmbiDef.z);
+	skylight->setDirection(directionDef.x, directionDef.y, directionDef.z);
+	skylight->setPosition(skyPosDef.x, skyPosDef.y, skyPosDef.z);
 
 	pointlight = new myLight();
 	//pointlight->setType(2);
-	pointlight->setAmbientColour(0.1f, 0.1f, 0.0f, 0.1f);
-	pointlight->setDiffuseColour(1.0f, 0.5f, 0.0f, 1.0f);
-	pointlight->setPosition(-33.0f, 15.0f, 15.0f);
-	pointlight->setAtten(0.5f, 0.25f, 0.0f);
+	pointlight->setAmbientColour(ambiDef.w, ambiDef.x, ambiDef.y, ambiDef.z);
+	pointlight->setDiffuseColour(pointdiffuseDef.w, pointdiffuseDef.x, pointdiffuseDef.y, pointdiffuseDef.z);
+	pointlight->setPosition(posDef.x, posDef.y, posDef.z);
+	pointlight->setAtten(attenuDef.x, attenuDef.y, attenuDef.z);
 
 	spotlight = new myLight();
-	spotlight->setAmbientColour(0.0f, 0.0f, 0.0f, 1.0f);
-	spotlight->setDiffuseColour(0.0f, 0.0f, 1.0f, 1.0f);
-	spotlight->setPosition(-33.0f, 105.0f, 25.0f);
-	spotlight->setAtten(0.5f, 0.25f, 0.0f);
-	spotlight->setDirection(0.0f, 1.0f, 0.0f);
-	spotlight->setSpecularColour(1.0f, 1.0f, 1.0f, 1.0f);
-	spotlight->setSpecularPower(0.5f);
-	spotlight->setCone(1.0f);
-	spotlight->setRange(100.0f);
+	spotlight->setAmbientColour(spotAmbiDef.w, spotAmbiDef.x, spotAmbiDef.y, spotAmbiDef.z);
+	spotlight->setDiffuseColour(spotDiffuseDef.w, spotDiffuseDef.x, spotDiffuseDef.y, spotDiffuseDef.z);
+	spotlight->setPosition(spotPosDef.x, spotPosDef.y, spotPosDef.z);
+	spotlight->setAtten(spotAttenuDef.x, spotAttenuDef.y, spotAttenuDef.z);
+	spotlight->setDirection(spotDirectionDef.x, spotDirectionDef.y, spotDirectionDef.z);
+	spotlight->setSpecularColour(specularColourDef.w, specularColourDef.x, specularColourDef.y, specularColourDef.z);
+	spotlight->setSpecularPower(specularPowerDef);
+	spotlight->setCone(spotConeDef);
+	spotlight->setRange(spotRangeDef);
 
 
 	pos = pointlight->getPosition();
@@ -104,6 +103,10 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	spotAttenu = spotlight->getAtten();
 	spotRange = spotlight->getRange();
 	spotCone = spotlight->getCone();
+
+	treePos1 = treePos1Def;
+	treePos2 = treePos2Def;
+	treePos3 = treePos3Def;
 }
 
 
@@ -287,7 +290,7 @@ bool App1::render()
 
 	if (edgeEnabled)
 	{
-		//horizontalEdge();
+		horizontalEdge();
 
 		verticalEdge();
 	}
@@ -315,52 +318,37 @@ void App1::firstRender()
 	XMMATRIX viewMatrix = camera->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
-	//worldMatrix = XMMatrixRotationZ(45);
-	//ground->sendData(renderer->getDeviceContext());
-	//groundShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"myHeightMap"), textureMgr->getTexture(L"snowTexture"), skylight, pointlight, showNorms);
-	//groundShader->render(renderer->getDeviceContext(), ground->getIndexCount());
-	//lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight);
-	//lightShader->render(renderer->getDeviceContext(), ground->getIndexCount());
-
-
-	worldMatrix = XMMatrixTranslation(-30, 5, 30);
+	worldMatrix = XMMatrixTranslation(treePos1.x, treePos1.y, treePos1.z);
 	model[0]->sendData(renderer->getDeviceContext());
-	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight);
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight, showNorms);
 	lightShader->render(renderer->getDeviceContext(), model[0]->getIndexCount());
-	worldMatrix = XMMatrixTranslation(30, -5, -30);
+	worldMatrix = XMMatrixTranslation(-treePos1.x, -treePos1.y, -treePos1.z);
 
-	worldMatrix = XMMatrixTranslation(-40, 5, 20);
+	worldMatrix = XMMatrixTranslation(treePos2.x, treePos2.y, treePos2.z);
 	model[1]->sendData(renderer->getDeviceContext());
-	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight);
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight, showNorms);
 	lightShader->render(renderer->getDeviceContext(), model[1]->getIndexCount());
-	worldMatrix = XMMatrixTranslation(40, 5, -20);
+	worldMatrix = XMMatrixTranslation(-treePos2.x, -treePos2.y, -treePos2.z);
 
-	worldMatrix = XMMatrixTranslation(-20, 5, 10);
+	worldMatrix = XMMatrixTranslation(treePos3.x, treePos3.y, treePos3.z);
 	model[2]->sendData(renderer->getDeviceContext());
-	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight);
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight, showNorms);
 	lightShader->render(renderer->getDeviceContext(), model[2]->getIndexCount());
-	worldMatrix = XMMatrixTranslation(20, -5, -10);
-
-	//worldMatrix = XMMatrixTranslation(60, 0, 60);
-	//model[3]->sendData(renderer->getDeviceContext());
-	//lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight);
-	//lightShader->render(renderer->getDeviceContext(), model[3]->getIndexCount());
-	//worldMatrix = XMMatrixTranslation(-60, -5, -60);
-
-//	XMMATRIX scaleMatrix1 = XMMatrixScaling(2.0f, 2.0f, 2.0f);
-	//worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix1);
+	worldMatrix = XMMatrixTranslation(-treePos3.x, -treePos3.y, -treePos3.z);
 
 	if (renderSphere)
 	{
 		worldMatrix = XMMatrixTranslation(pointlight->getPosition().x, pointlight->getPosition().y, pointlight->getPosition().z);
 		pointLightSphere->sendData(renderer->getDeviceContext());
-		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight, skylight, spotlight);
+		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight, skylight, spotlight, showNorms);
 		lightShader->render(renderer->getDeviceContext(), pointLightSphere->getIndexCount());		worldMatrix = XMMatrixTranslation(pointlight->getPosition().x, pointlight->getPosition().y, pointlight->getPosition().z);
-		
+		worldMatrix = XMMatrixTranslation(-pointlight->getPosition().x, -pointlight->getPosition().y, -pointlight->getPosition().z);
+
 		worldMatrix = XMMatrixTranslation(spotlight->getPosition().x, spotlight->getPosition().y, spotlight->getPosition().z);
 		spotLightSphere->sendData(renderer->getDeviceContext());
-		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight, skylight,spotlight);
+		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight, skylight,spotlight, showNorms);
 		lightShader->render(renderer->getDeviceContext(), spotLightSphere->getIndexCount());
+		worldMatrix = XMMatrixTranslation(-spotlight->getPosition().x, -spotlight->getPosition().y, -spotlight->getPosition().z);
 	}
 
 	// Present the rendered scene to the screen.
@@ -379,46 +367,28 @@ void App1::depthRender()
 	XMMATRIX worldMatrix = renderer->getWorldMatrix();
 
 	worldMatrix = XMMatrixTranslation(-115, 5, 10);
-	//XMMATRIX shadowPlaneScaleMatrix = XMMatrixScaling(0.5, 0.5, 0.5);
-	//worldMatrix = XMMatrixMultiply(worldMatrix, shadowPlaneScaleMatrix);
-
 	ground->sendData(renderer->getDeviceContext());
 	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
 	depthShader->render(renderer->getDeviceContext(), ground->getIndexCount());
-	worldMatrix = XMMatrixTranslation(30, -5, -30);
+	worldMatrix = XMMatrixTranslation(115, -5, -10);
 
-	//XMMATRIX scaleMatrix = XMMatrixScaling(0.5f, 0.5f, 0.5f);
-	//worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix);
-	worldMatrix = XMMatrixTranslation(-30, 5, 30);
-
+	worldMatrix = XMMatrixTranslation(treePos1.x, treePos1.y, treePos1.z);
 	model[0]->sendData(renderer->getDeviceContext());
 	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
 	depthShader->render(renderer->getDeviceContext(), model[0]->getIndexCount());
-	worldMatrix = XMMatrixTranslation(30, -5, -30);
+	worldMatrix = XMMatrixTranslation(-treePos1.x, -treePos1.y, -treePos1.z);
 
-	worldMatrix = XMMatrixTranslation(-40, 5, 20);
+	worldMatrix = XMMatrixTranslation(treePos2.x, treePos2.y, treePos2.z);
 	model[1]->sendData(renderer->getDeviceContext());
 	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
 	depthShader->render(renderer->getDeviceContext(), model[1]->getIndexCount());
-	worldMatrix = XMMatrixTranslation(40, -5, -20);
+	worldMatrix = XMMatrixTranslation(-treePos2.x, -treePos2.y, -treePos2.z);
 
-
-	worldMatrix = XMMatrixTranslation(-20, 5, 10);
+	worldMatrix = XMMatrixTranslation(treePos3.x, treePos3.y, treePos3.z);
 	model[2]->sendData(renderer->getDeviceContext());
 	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
 	depthShader->render(renderer->getDeviceContext(), model[2]->getIndexCount());
-
-	//worldMatrix = XMMatrixTranslation(-15, 0, 0);
-	//model[3]->sendData(renderer->getDeviceContext());
-	//depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
-	//depthShader->render(renderer->getDeviceContext(), model[3]->getIndexCount());
-//	worldMatrix = XMMatrixTranslation(45, -10, -50);
-
-
-	/*shadowGround->sendData(renderer->getDeviceContext());
-	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
-	depthShader->render(renderer->getDeviceContext(), shadowGround->getIndexCount());*/
-
+	worldMatrix = XMMatrixTranslation(-treePos3.x, -treePos3.y, -treePos3.z);
 
 	renderer->setBackBufferRenderTarget();
 	renderer->resetViewport();
@@ -435,49 +405,28 @@ void App1::scndRender()
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
 	worldMatrix = XMMatrixTranslation(-115, 0, 10);
-	//XMMATRIX shadowPlaneScaleMatrix = XMMatrixScaling(0.5, 1.0, 0.5);
-	//worldMatrix = XMMatrixMultiply(worldMatrix, shadowPlaneScaleMatrix);
-
-	//shadowGround->sendData(renderer->getDeviceContext());
-	//shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), shadowMap->getDepthMapSRV(), skylight);
-	//shadowShader->render(renderer->getDeviceContext(), shadowGround->getIndexCount());
-
 	ground->sendData(renderer->getDeviceContext());
 	groundShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"myHeightMap"), textureMgr->getTexture(L"snowTexture"), shadowMap->getDepthMapSRV(), skylight, pointlight, spotlight ,showNorms);
 	groundShader->render(renderer->getDeviceContext(), ground->getIndexCount());
+	worldMatrix = XMMatrixTranslation(115, 0, -10);
 
-	XMMATRIX scaleMatrix = XMMatrixScaling(2.0f, 1.0f, 2.0f);
-	worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix);
-
-	worldMatrix = XMMatrixTranslation(-30, 5, 30);
+	worldMatrix = XMMatrixTranslation(treePos1.x, treePos1.y, treePos1.z);
 	model[0]->sendData(renderer->getDeviceContext());
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), shadowMap->getDepthMapSRV(), skylight);
 	shadowShader->render(renderer->getDeviceContext(), model[0]->getIndexCount());
-	worldMatrix = XMMatrixTranslation(30, -5, -30);
+	worldMatrix = XMMatrixTranslation(-treePos1.x, -treePos1.y, -treePos1.z);
 
-	worldMatrix = XMMatrixTranslation(-40, 5, 20);
+	worldMatrix = XMMatrixTranslation(treePos2.x, treePos2.y, treePos2.z);
 	model[1]->sendData(renderer->getDeviceContext());
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), shadowMap->getDepthMapSRV(), skylight);
 	shadowShader->render(renderer->getDeviceContext(), model[1]->getIndexCount());
-	worldMatrix = XMMatrixTranslation(40, -5, -20);
+	worldMatrix = XMMatrixTranslation(-treePos2.x, -treePos2.y, -treePos2.z);
 
-	worldMatrix = XMMatrixTranslation(-20, 5, 10);
+	worldMatrix = XMMatrixTranslation(treePos3.x, treePos3.y, treePos3.z);
 	model[2]->sendData(renderer->getDeviceContext());
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), shadowMap->getDepthMapSRV(), skylight);
 	shadowShader->render(renderer->getDeviceContext(), model[2]->getIndexCount());
-	worldMatrix = XMMatrixTranslation(20, -5, -10);
-
-	//worldMatrix = XMMatrixTranslation(60, 0, 60);
-	//model[3]->sendData(renderer->getDeviceContext());
-	//shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), shadowMap->getDepthMapSRV(), skylight);
-	//shadowShader->render(renderer->getDeviceContext(), model[3]->getIndexCount());
-	//worldMatrix = XMMatrixTranslation(-60, 0, -60);
-
-	//XMMATRIX scaleMatrix1 = XMMatrixScaling(2.0f, 2.0f, 2.0f);
-	//worldMatrix = XMMatrixMultiply(worldMatrix, scaleMatrix1);
-//	renderer->setZBuffer(false);
-
-	worldMatrix = XMMatrixTranslation(115, -5, -10);
+	worldMatrix = XMMatrixTranslation(-treePos3.x, -treePos3.y, -treePos3.z);
 
 	XMMATRIX orthoMatrix = renderer->getOrthoMatrix();
 	XMMATRIX orthoViewMatrix = camera->getOrthoViewMatrix();
@@ -533,7 +482,7 @@ void App1::verticalEdge()
 	// Render for Vertical Blur
 	renderer->setZBuffer(false);
 	orthomesh->sendData(renderer->getDeviceContext());
-	verEdgeShader1->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, renderTexture->getShaderResourceView(), screenSizeY, screenSizeX);
+	verEdgeShader1->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, horizEdgeTexture->getShaderResourceView(), screenSizeY, screenSizeX);
 	verEdgeShader1->render(renderer->getDeviceContext(), orthomesh->getIndexCount());
 	renderer->setZBuffer(true);
 
@@ -594,82 +543,87 @@ void App1::gui()
 
 	if (ImGui::Button("Reset to default values"))
 	{
-		pos = XMFLOAT3(-33.0f, 15.0f, 15.0f);
-		direction = XMFLOAT3(-1.0f, -0.7f, 0.8f);
-		ambi = XMFLOAT4(0.1f, 0.1f, 0.0f, 0.1f);
-		attenu = XMFLOAT3(0.5f, 0.25f, 0.0f);
-		pointdiffuse = XMFLOAT4(1.0f, 0.5f, 0.0f, 1.0f);
-		skydiffuse = XMFLOAT4(0.1f, 0.1f, 0.2f, 0.1f);
-		skyAmbi = XMFLOAT4(0.0f, 0.1f, 0.0f, 0.1f);
-		skyPos = XMFLOAT3(0.0f, 20.0f, 0.0f);
+		//point light variables 
+		pos = posDef;
+		ambi = ambiDef;
+		attenu = attenuDef;
+		pointdiffuse = pointdiffuseDef;
 
-		spotAmbi = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-		spotDiffuse = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
-		spotDirection = XMFLOAT3(0.0f, 1.0f, 0.0f);
-		spotPos = XMFLOAT3(-33.0f, 105.0f, 25.0f);
-		specularColour = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		specularPower = 0.5f;
-		spotAttenu = XMFLOAT3(0.5f, 0.25f, 0.0f);
-		spotCone = 1.0f;
-		spotRange = 100.0f;
+		//skylight variables 
+		skydiffuse = skydiffuseDef;
+		skyAmbi = skyAmbiDef;
+		skyPos = skyPosDef;
+		direction = directionDef;
 
-		renderSphere = true;
+		//spotlight variables
+		spotAmbi = spotAmbiDef;
+		spotDiffuse = spotDiffuseDef;
+		spotDirection = spotDirectionDef;
+		spotPos = spotPosDef;
+		specularColour = specularColourDef;
+		specularPower = specularPowerDef;
+		spotAttenu = spotAttenuDef;
+		spotCone = spotConeDef;
+		spotRange = spotRangeDef;
+
+		renderSphere = false;
 		edgeEnabled = true;
 		showNorms = false;
 	}
 
+	ImGui::Checkbox("Show Light Sources", &renderSphere);
+
 	if (ImGui::CollapsingHeader("Spot light controls"))
 	{
 		ImGui::Indent(10);
-		ImGui::Checkbox("Show Light Source", &renderSphere);
-		if (ImGui::CollapsingHeader("Position_"))
+		if (ImGui::CollapsingHeader("Spot Position_"))
 		{
-			ImGui::SliderFloat("x pos", &spotPos.x, -100.0f, 100.0f);
-			ImGui::SliderFloat("y pos", &spotPos.y, -100.0f, 100.0f);
-			ImGui::SliderFloat("z pos", &spotPos.z, -100.0f, 100.0f);
+			ImGui::SliderFloat("Spot x pos", &spotPos.x, -100.0f, 100.0f);
+			ImGui::SliderFloat("Spot y pos", &spotPos.y, -100.0f, 100.0f);
+			ImGui::SliderFloat("Spot z pos", &spotPos.z, -100.0f, 100.0f);
 		}
 
-		if (ImGui::CollapsingHeader("Direction_"))
+		if (ImGui::CollapsingHeader("Spot Direction_"))
 		{
-			ImGui::SliderFloat("x pos", &spotDirection.x, -100.0f, 100.0f);
-			ImGui::SliderFloat("y pos", &spotDirection.y, -100.0f, 100.0f);
-			ImGui::SliderFloat("z pos", &spotDirection.z, -100.0f, 100.0f);
-			ImGui::SliderFloat("Range", &spotRange, 0.0f, 200.0f);
-			ImGui::SliderFloat("Cone", &spotCone, 0.0f, 10.0f);
+			ImGui::SliderFloat("Spot x direction", &spotDirection.x, -100.0f, 100.0f);
+			ImGui::SliderFloat("Spot y direction", &spotDirection.y, -100.0f, 100.0f);
+			ImGui::SliderFloat("Spot z direction", &spotDirection.z, -100.0f, 100.0f);
+			ImGui::SliderFloat("Spot Range", &spotRange, 0.0f, 200.0f);
+			ImGui::SliderFloat("Spot Cone", &spotCone, 0.0f, 10.0f);
 		}
 
-		if (ImGui::CollapsingHeader("Attenuation_"))
+		if (ImGui::CollapsingHeader("Spot Attenuation_"))
 		{
-			ImGui::SliderFloat("Attenuation x", &spotAttenu.x, 0.0f, 1.0f);
-			ImGui::SliderFloat("Attenuation y", &spotAttenu.y, 0.0f, 1.0f);
-			ImGui::SliderFloat("Attenuation z", &spotAttenu.z, 0.0f, 1.0f);
+			ImGui::SliderFloat("Spot Attenuation x", &spotAttenu.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("Spot Attenuation y", &spotAttenu.y, 0.0f, 1.0f);
+			ImGui::SliderFloat("Spot Attenuation z", &spotAttenu.z, 0.0f, 1.0f);
 		}
 
 		if (ImGui::CollapsingHeader("Diffuse Colour_"))
 		{
 
-			ImGui::SliderFloat("Red", &spotDiffuse.w, 0.0f, 1.0f);
-			ImGui::SliderFloat("Blue", &spotDiffuse.x, 0.0f, 1.0f);
-			ImGui::SliderFloat("Green", &spotDiffuse.y, 0.0f, 1.0f);
-			ImGui::SliderFloat("Alpha", &spotDiffuse.z, 0.0f, 1.0f);
+			ImGui::SliderFloat("Spot Red ", &spotDiffuse.w, 0.0f, 1.0f);
+			ImGui::SliderFloat("Spot Blue ", &spotDiffuse.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("Spot Green ", &spotDiffuse.y, 0.0f, 1.0f);
+			ImGui::SliderFloat("Spot Alpha ", &spotDiffuse.z, 0.0f, 1.0f);
 		}		
 		
 		if (ImGui::CollapsingHeader("Specular Diffuse Colour_"))
 		{
 
-			ImGui::SliderFloat("Red", &specularColour.w, 0.0f, 1.0f);
-			ImGui::SliderFloat("Blue", &specularColour.x, 0.0f, 1.0f);
-			ImGui::SliderFloat("Green", &specularColour.y, 0.0f, 1.0f);
-			ImGui::SliderFloat("Alpha", &specularColour.z, 0.0f, 1.0f);
+			ImGui::SliderFloat("spec Red_", &specularColour.w, 0.0f, 1.0f);
+			ImGui::SliderFloat("spec Blue_", &specularColour.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("spec Green_", &specularColour.y, 0.0f, 1.0f);
+			ImGui::SliderFloat("spec Alpha_", &specularColour.z, 0.0f, 1.0f);
 			ImGui::SliderFloat("Specular Power", &specularPower, 0.0f, 1.0f);
 		}
 
 		if (ImGui::CollapsingHeader("Ambient Colour_"))
 		{
-			ImGui::SliderFloat("Ambient Red", &spotAmbi.w, 0.0f, 1.0f);
-			ImGui::SliderFloat("Ambient Green", &spotAmbi.x, 0.0f, 1.0f);
-			ImGui::SliderFloat("Ambient Blue", &spotAmbi.y, 0.0f, 1.0f);
-			ImGui::SliderFloat("Ambient Alpha", &spotAmbi.z, 0.0f, 1.0f);
+			ImGui::SliderFloat("Spot Ambient Red_", &spotAmbi.w, 0.0f, 1.0f);
+			ImGui::SliderFloat("Spot Ambient Green_", &spotAmbi.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("Spot Ambient Blue_", &spotAmbi.y, 0.0f, 1.0f);
+			ImGui::SliderFloat("Spot Ambient Alpha_", &spotAmbi.z, 0.0f, 1.0f);
 		}
 
 		ImGui::Indent(-10);
@@ -678,36 +632,35 @@ void App1::gui()
 	if (ImGui::CollapsingHeader("Point light controls"))
 	{
 		ImGui::Indent(10);
-		ImGui::Checkbox("Show Light Source", &renderSphere);
-		if (ImGui::CollapsingHeader("Position"))
+		if (ImGui::CollapsingHeader("Point Position"))
 		{
-			ImGui::SliderFloat("x pos", &pos.x, -100.0f, 100.0f);
-			ImGui::SliderFloat("y pos", &pos.y, -100.0f, 100.0f);
-			ImGui::SliderFloat("z pos", &pos.z, -100.0f, 100.0f);
+			ImGui::SliderFloat("Point x pos", &pos.x, -100.0f, 100.0f);
+			ImGui::SliderFloat("Point y pos", &pos.y, -100.0f, 100.0f);
+			ImGui::SliderFloat("Point z pos", &pos.z, -100.0f, 100.0f);
 		}
 
-		if (ImGui::CollapsingHeader("Attenuation"))
+		if (ImGui::CollapsingHeader("Point Attenuation"))
 		{
-			ImGui::SliderFloat("Attenuation x", &attenu.x, 0.0f, 1.0f);
-			ImGui::SliderFloat("Attenuation y", &attenu.y, 0.0f, 1.0f);
-			ImGui::SliderFloat("Attenuation z", &attenu.z, 0.0f, 1.0f);
+			ImGui::SliderFloat("Point Attenuation x", &attenu.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("Point Attenuation y", &attenu.y, 0.0f, 1.0f);
+			ImGui::SliderFloat("Point Attenuation z", &attenu.z, 0.0f, 1.0f);
 		}
 
-		if (ImGui::CollapsingHeader("Diffuse Colour"))
+		if (ImGui::CollapsingHeader("Point Diffuse Colour"))
 		{
 			
-			ImGui::SliderFloat("Red", &pointdiffuse.w, 0.0f, 1.0f);
-			ImGui::SliderFloat("Blue", &pointdiffuse.x, 0.0f, 1.0f);
-			ImGui::SliderFloat("Green", &pointdiffuse.y, 0.0f, 1.0f);
-			//ImGui::SliderFloat("Alpha", &pointdiffuse.z, 0.0f, 1.0f);
+			ImGui::SliderFloat("Point Red", &pointdiffuse.w, 0.0f, 1.0f);
+			ImGui::SliderFloat("Point Blue", &pointdiffuse.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("Point Green", &pointdiffuse.y, 0.0f, 1.0f);
+			ImGui::SliderFloat("Point Alpha", &pointdiffuse.z, 0.0f, 1.0f);
 		}
 
-		if (ImGui::CollapsingHeader("Ambient Colour"))
+		if (ImGui::CollapsingHeader("Point Ambient Colour"))
 		{
-			ImGui::SliderFloat("Ambient Red", &ambi.w, 0.0f, 1.0f);
-			ImGui::SliderFloat("Ambient Green", &ambi.x, 0.0f, 1.0f);
-			ImGui::SliderFloat("Ambient Blue", &ambi.y, 0.0f, 1.0f);
-			//ImGui::SliderFloat("Ambient Alpha", &ambi.z, 0.0f, 1.0f);
+			ImGui::SliderFloat("Point Ambient Red", &ambi.w, 0.0f, 1.0f);
+			ImGui::SliderFloat("Point Ambient Green", &ambi.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("Point Ambient Blue", &ambi.y, 0.0f, 1.0f);
+			ImGui::SliderFloat("Point Ambient Alpha", &ambi.z, 0.0f, 1.0f);
 		}
 	
 		ImGui::Indent(-10);
@@ -716,34 +669,34 @@ void App1::gui()
 	if (ImGui::CollapsingHeader("Sky light controls"))
 	{
 		ImGui::Indent(10);
-		if (ImGui::CollapsingHeader("Position"))
+		if (ImGui::CollapsingHeader("Sky Position"))
 		{
-			ImGui::SliderFloat("x pos ", &skyPos.x, -10.0f, 30.0f);
-			ImGui::SliderFloat("y pos ", &skyPos.y, -10.0f, 30.0f);
-			ImGui::SliderFloat("z pos ", &skyPos.z, -10.0f, 30.0f);
+			ImGui::SliderFloat("Sky x pos  ", &skyPos.x, -10.0f, 30.0f);
+			ImGui::SliderFloat("Sky y pos  ", &skyPos.y, -10.0f, 30.0f);
+			ImGui::SliderFloat("Sky z pos  ", &skyPos.z, -10.0f, 30.0f);
 		}
 
-		if (ImGui::CollapsingHeader("Direction"))
+		if (ImGui::CollapsingHeader("Sky Direction"))
 		{
-			ImGui::SliderFloat("Direction x", &direction.x, -1.0f, 1.0f);
-			ImGui::SliderFloat("Direction y", &direction.y, -1.0f, -0.5f);
-			ImGui::SliderFloat("Direction z", &direction.z, 0.0f, 1.0f);
+			ImGui::SliderFloat("Sky Direction x", &direction.x, -1.0f, 1.0f);
+			ImGui::SliderFloat("Sky Direction y", &direction.y, -1.0f, -0.5f);
+			ImGui::SliderFloat("Sky Direction z", &direction.z, 0.0f, 1.0f);
 		}
 
-		if (ImGui::CollapsingHeader("Diffuse Colour"))
+		if (ImGui::CollapsingHeader("Sky Diffuse Colour"))
 		{
-			ImGui::SliderFloat("Red ", &skydiffuse.w, 0.0f, 1.0f);
-			ImGui::SliderFloat("Green ", &skydiffuse.x, 0.0f, 1.0f);
-			ImGui::SliderFloat("Blue ", &skydiffuse.y, 0.0f, 1.0f);
-			//ImGui::SliderFloat("Alpha ", &skydiffuse.z, 0.0f, 1.0f);
+			ImGui::SliderFloat("Sky Red ", &skydiffuse.w, 0.0f, 1.0f);
+			ImGui::SliderFloat("Sky Green ", &skydiffuse.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("Sky Blue ", &skydiffuse.y, 0.0f, 1.0f);
+			ImGui::SliderFloat("Sky Alpha ", &skydiffuse.z, 0.0f, 1.0f);
 		}
 
-		if (ImGui::CollapsingHeader("Ambient Colour"))
+		if (ImGui::CollapsingHeader("Sky Ambient Colour"))
 		{
-			ImGui::SliderFloat("Ambient Red ", &skyAmbi.w, 0.0f, 1.0f);
-			ImGui::SliderFloat("Ambient Green ", &skyAmbi.x, 0.0f, 1.0f);
-			ImGui::SliderFloat("Ambient Blue ", &skyAmbi.y, 0.0f, 1.0f);
-			//ImGui::SliderFloat("Ambient Alpha ", &skyAmbi.z, 0.0f, 1.0f);
+			ImGui::SliderFloat("Sky Ambient Red ", &skyAmbi.w, 0.0f, 1.0f);
+			ImGui::SliderFloat("Sky Ambient Green ", &skyAmbi.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("Sky Ambient Blue ", &skyAmbi.y, 0.0f, 1.0f);
+			ImGui::SliderFloat("Sky Ambient Alpha ", &skyAmbi.z, 0.0f, 1.0f);
 		}
 		ImGui::Indent(-10);
 	}
