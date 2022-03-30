@@ -69,14 +69,14 @@ protected:
 
 	//default values for modifiable variables
 	//point
-	XMFLOAT3 posDef = XMFLOAT3(-65.0f, 15.0f, 55.0f);
+	XMFLOAT3 posDef = XMFLOAT3(-40.0f, -5.0f, 24.0f);
 	XMFLOAT4 pointdiffuseDef = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	XMFLOAT4 ambiDef = XMFLOAT4(0.1f, 0.1f, 0.0f, 0.1f);;
 	XMFLOAT3 attenuDef = XMFLOAT3(0.5f, 0.25f, 0.0f);
 
 	//sky
-	XMFLOAT4 skydiffuseDef = XMFLOAT4(0.1f, 0.0f, 0.5f, 1.0f);
-	XMFLOAT4 skyAmbiDef = XMFLOAT4(0.0f, 0.0f, 0.1f, 0.1f);
+	XMFLOAT4 skydiffuseDef = XMFLOAT4(0.5f, 0.5f, 1.0f, 1.0f);
+	XMFLOAT4 skyAmbiDef = XMFLOAT4(0.0f, 0.1f, 0.5f, 0.5f);
 	XMFLOAT3 skyPosDef = XMFLOAT3(-10.0f, 15.0f, 30.0f);
 	XMFLOAT3 directionDef = XMFLOAT3(-0.85f, -0.5f, 0.0f);
 
@@ -91,6 +91,8 @@ protected:
 	float spotRangeDef = 100.0f;
 	float spotConeDef = 1.0f;
 
+	void wireFrameRender();
+
 	void depthRender();
 	void firstRender();
 	void scndRender();
@@ -98,7 +100,6 @@ protected:
 	void verticalEdge();
 	void horizontalEdge();
 
-	//void depthPass();
 	void finalPass();
 
 private:
