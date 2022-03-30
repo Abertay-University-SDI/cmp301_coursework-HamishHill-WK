@@ -75,6 +75,18 @@ void LightShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilenam
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	renderer->CreateSamplerState(&samplerDesc, &sampleState);
 
+	// Sampler for shadow map sampling.
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	samplerDesc.BorderColor[0] = 1.0f;
+	samplerDesc.BorderColor[1] = 1.0f;
+	samplerDesc.BorderColor[2] = 1.0f;
+	samplerDesc.BorderColor[3] = 1.0f;
+	renderer->CreateSamplerState(&samplerDesc, &sampleStateShadow);
+
+
 	// Setup light buffer
 	// Setup the description of the light dynamic constant buffer that is in the pixel shader.
 	// Note that ByteWidth always needs to be a multiple of 16 if using D3D11_BIND_CONSTANT_BUFFER or CreateBuffer will fail.
@@ -98,14 +110,15 @@ void LightShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilenam
 }
 
 
-void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* texture, myLight* light, myLight* skylight, myLight* spotlight, bool normals)
+void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* depthMap, myLight* light, myLight* skylight, myLight* spotlight, bool normals)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
 	
 	XMMATRIX tworld, tview, tproj;
-
+	XMMATRIX tLightViewMatrix = XMMatrixTranspose(skylight->getViewMatrix());
+	XMMATRIX tLightProjectionMatrix = XMMatrixTranspose(skylight->getOrthoMatrix());
 
 	// Transpose the matrices to prepare them for the shader.
 	tworld = XMMatrixTranspose(worldMatrix);
@@ -116,6 +129,8 @@ void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const 
 	dataPtr->world = tworld;// worldMatrix;
 	dataPtr->view = tview;
 	dataPtr->projection = tproj;
+	dataPtr->lightView = tLightViewMatrix;
+	dataPtr->lightProjection = tLightProjectionMatrix;
 	deviceContext->Unmap(matrixBuffer, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, &matrixBuffer);
 
@@ -153,10 +168,6 @@ void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const 
 	spotlightPtr->range = spotlight->getRange();
 	spotlightPtr->cone = spotlight->getCone();
 
-	//lightPtr->pad1[0] = 0.0f;
-	//lightPtr->pad1[1] = 0.0f;
-	//lightPtr->pad1[2] = 0.0f;
-
 	deviceContext->Unmap(lightBuffer, 0);
 	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);	
 	
@@ -166,4 +177,7 @@ void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const 
 	// Set shader texture resource in the pixel shader.
 	deviceContext->PSSetShaderResources(0, 1, &texture);
 	deviceContext->PSSetSamplers(0, 1, &sampleState);
+
+	deviceContext->PSSetShaderResources(1, 1, &depthMap);
+	deviceContext->PSSetSamplers(1, 1, &sampleStateShadow);
 }

@@ -63,7 +63,5 @@ private:
 	ID3D11SamplerState* sampleStateShadow;
 	ID3D11Buffer* lightBuffer;
 	ID3D11Buffer* spotlightBuffer;
-	//ID3D11Buffer* timeBuffer;
-
 };
 

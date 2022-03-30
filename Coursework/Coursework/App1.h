@@ -12,6 +12,7 @@
 #include "ShadowShader.h"
 #include "verEdgeShader.h"
 #include "horEdgeShader.h"
+#include "verManipDepthShader.h"
 
 #include "myLight.h"
 
@@ -110,28 +111,26 @@ private:
 	ShadowShader* shadowShader =0;
 	verEdgeShader* verEdgeShader1 =0;
 	horEdgeShader* horEdgeShader1 =0;
+	verManipDepthShader* verManipDepthShader1 = 0;
 
 	PlaneMesh* ground = 0;
 	PlaneMesh* shadowGround =0 ;
 	AModel* model[4] = { 0,0,0,0 };
 
-	SphereMesh* pointLightSphere;
-	SphereMesh* spotLightSphere;	
-	SphereMesh* skyLightSphere;
+	SphereMesh* pointLightSphere = 0;
+	SphereMesh* spotLightSphere = 0;	
+	SphereMesh* skyLightSphere = 0;
 
-	myLight* skylight;
-	myLight* pointlight;
-	myLight* spotlight;
-	//myLight* shadowlight;
+	myLight* skylight = 0;
+	myLight* pointlight = 0;
+	myLight* spotlight = 0;
 
-	OrthoMesh* orthomesh;
-	RenderTexture* renderTexture;
-	//RenderTexture* renderTexture1;
-	//RenderTexture* renderTexture2;
-	RenderTexture* horizEdgeTexture;
-	RenderTexture* vertEdgeTexture;
+	OrthoMesh* orthomesh = 0;
+	RenderTexture* renderTexture = 0;
+	RenderTexture* horizEdgeTexture = 0;
+	RenderTexture* vertEdgeTexture = 0;
 
-	ShadowMap* shadowMap;
+	ShadowMap* shadowMap = 0;
 };
 
 #endif

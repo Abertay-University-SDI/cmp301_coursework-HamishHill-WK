@@ -1,10 +1,10 @@
-// Light vertex shader
-// Standard issue vertex shader, apply matrices, pass info to pixel shader
 cbuffer MatrixBuffer : register(b0)
 {
     matrix worldMatrix;
     matrix viewMatrix;
     matrix projectionMatrix;
+    matrix lightViewMatrix;
+    matrix lightProjectionMatrix;
 };
 
 cbuffer CameraBuffer : register(b1)
@@ -27,6 +27,7 @@ struct OutputType
     float3 normal : NORMAL;
     float3 worldPosition : TEXCOORD1;
     float3 view : TEXCOORD2;
+    float4 lightViewPos : TEXCOORD3;
 };
 
 OutputType main(InputType input)
@@ -48,6 +49,10 @@ OutputType main(InputType input)
     output.worldPosition = mul(input.position, worldMatrix).xyz;
     output.view = cameraPos.xyz - output.worldPosition.xyz;
     output.view = normalize(output.view);
+    
+    output.lightViewPos = mul(input.position, worldMatrix);
+    output.lightViewPos = mul(output.lightViewPos, lightViewMatrix);
+    output.lightViewPos = mul(output.lightViewPos, lightProjectionMatrix);
     
     return output;
 }

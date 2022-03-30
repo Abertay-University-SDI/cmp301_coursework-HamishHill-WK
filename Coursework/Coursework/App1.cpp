@@ -36,11 +36,11 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 
 	orthomesh = new OrthoMesh(renderer->getDevice(), renderer->getDeviceContext(), screenWidth , screenHeight);
 	renderTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
-	//renderTexture1 = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
 	vertEdgeTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
 	horizEdgeTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
 
 	depthShader = new DepthShader(renderer->getDevice(), hwnd);
+	verManipDepthShader1 = new verManipDepthShader(renderer->getDevice(), hwnd);
 	shadowShader = new ShadowShader(renderer->getDevice(), hwnd);
 
 	// Variables for defining shadow map
@@ -332,22 +332,23 @@ void App1::wireFrameRender()
 
 	worldMatrix = XMMatrixTranslation(treePos1.x, treePos1.y, treePos1.z);
 	model[0]->sendData(renderer->getDeviceContext());
-	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight, showNorms);
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), NULL, pointlight, skylight, spotlight, showNorms);
 	lightShader->render(renderer->getDeviceContext(), model[0]->getIndexCount());
 	worldMatrix = XMMatrixTranslation(-treePos1.x, -treePos1.y, -treePos1.z);
 
 	worldMatrix = XMMatrixTranslation(treePos2.x, treePos2.y, treePos2.z);
 	model[1]->sendData(renderer->getDeviceContext());
-	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight, showNorms);
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), NULL, pointlight, skylight, spotlight, showNorms);
 	lightShader->render(renderer->getDeviceContext(), model[1]->getIndexCount());
 	worldMatrix = XMMatrixTranslation(-treePos2.x, -treePos2.y, -treePos2.z);
 
 	worldMatrix = XMMatrixTranslation(treePos3.x, treePos3.y, treePos3.z);
 	model[2]->sendData(renderer->getDeviceContext());
-	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight, showNorms);
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), NULL, pointlight, skylight, spotlight, showNorms);
 	lightShader->render(renderer->getDeviceContext(), model[2]->getIndexCount());
 	worldMatrix = XMMatrixTranslation(-treePos3.x, -treePos3.y, -treePos3.z);
 }
+
 void App1::firstRender()
 {
 	renderTexture->setRenderTarget(renderer->getDeviceContext());
@@ -358,46 +359,45 @@ void App1::firstRender()
 	XMMATRIX viewMatrix = camera->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
-	worldMatrix = XMMatrixTranslation(treePos1.x, treePos1.y, treePos1.z);
-	model[0]->sendData(renderer->getDeviceContext());
-	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight, showNorms);
-	lightShader->render(renderer->getDeviceContext(), model[0]->getIndexCount());
-	worldMatrix = XMMatrixTranslation(-treePos1.x, -treePos1.y, -treePos1.z);
+	//worldMatrix = XMMatrixTranslation(treePos1.x, treePos1.y, treePos1.z);
+	//model[0]->sendData(renderer->getDeviceContext());
+	//lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight, showNorms);
+	//lightShader->render(renderer->getDeviceContext(), model[0]->getIndexCount());
+	//worldMatrix = XMMatrixTranslation(-treePos1.x, -treePos1.y, -treePos1.z);
 
-	worldMatrix = XMMatrixTranslation(treePos2.x, treePos2.y, treePos2.z);
-	model[1]->sendData(renderer->getDeviceContext());
-	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight, showNorms);
-	lightShader->render(renderer->getDeviceContext(), model[1]->getIndexCount());
-	worldMatrix = XMMatrixTranslation(-treePos2.x, -treePos2.y, -treePos2.z);
+	//worldMatrix = XMMatrixTranslation(treePos2.x, treePos2.y, treePos2.z);
+	//model[1]->sendData(renderer->getDeviceContext());
+	//lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight, showNorms);
+	//lightShader->render(renderer->getDeviceContext(), model[1]->getIndexCount());
+	//worldMatrix = XMMatrixTranslation(-treePos2.x, -treePos2.y, -treePos2.z);
 
-	worldMatrix = XMMatrixTranslation(treePos3.x, treePos3.y, treePos3.z);
-	model[2]->sendData(renderer->getDeviceContext());
-	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight, showNorms);
-	lightShader->render(renderer->getDeviceContext(), model[2]->getIndexCount());
-	worldMatrix = XMMatrixTranslation(-treePos3.x, -treePos3.y, -treePos3.z);
+	//worldMatrix = XMMatrixTranslation(treePos3.x, treePos3.y, treePos3.z);
+	//model[2]->sendData(renderer->getDeviceContext());
+	//lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), pointlight, skylight, spotlight, showNorms);
+	//lightShader->render(renderer->getDeviceContext(), model[2]->getIndexCount());
+	//worldMatrix = XMMatrixTranslation(-treePos3.x, -treePos3.y, -treePos3.z);
 
 	if (renderSphere)
 	{
 		worldMatrix = XMMatrixTranslation(pos.x, pos.y, pos.z);
 		pointLightSphere->sendData(renderer->getDeviceContext());
-		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight, skylight, spotlight, showNorms);
+		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), shadowMap->getDepthMapSRV(), pointlight, skylight, spotlight, showNorms);
 		lightShader->render(renderer->getDeviceContext(), pointLightSphere->getIndexCount());		worldMatrix = XMMatrixTranslation(pointlight->getPosition().x, pointlight->getPosition().y, pointlight->getPosition().z);
 		worldMatrix = XMMatrixTranslation(-pos.x, -pos.y, -pos.z);
 
 		worldMatrix = XMMatrixTranslation(spotPos.x, spotPos.y, spotPos.z);
 		spotLightSphere->sendData(renderer->getDeviceContext());
-		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight, skylight,spotlight, showNorms);
+		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), shadowMap->getDepthMapSRV(), pointlight, skylight,spotlight, showNorms);
 		lightShader->render(renderer->getDeviceContext(), spotLightSphere->getIndexCount());
 		worldMatrix = XMMatrixTranslation(-spotPos.x, -spotPos.y, -spotPos.z);
 	
 		worldMatrix = XMMatrixTranslation(skyPos.x, skyPos.y, skyPos.z);
 		skyLightSphere->sendData(renderer->getDeviceContext());
-		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight, skylight, spotlight, showNorms);
+		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), shadowMap->getDepthMapSRV(), pointlight, skylight, spotlight, showNorms);
 		lightShader->render(renderer->getDeviceContext(), skyLightSphere->getIndexCount());
 		worldMatrix = XMMatrixTranslation(-skyPos.x, -skyPos.y, -skyPos.z);
 	}
 
-	// Present the rendered scene to the screen.
 	renderer->setBackBufferRenderTarget();
 }
 
@@ -413,8 +413,8 @@ void App1::depthRender()
 
 	worldMatrix = XMMatrixTranslation(groundPos.x, groundPos.y, groundPos.z);
 	ground->sendData(renderer->getDeviceContext());
-	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
-	depthShader->render(renderer->getDeviceContext(), ground->getIndexCount());
+	verManipDepthShader1->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix, textureMgr->getTexture(L"myHeightMap"));
+	verManipDepthShader1->render(renderer->getDeviceContext(), ground->getIndexCount());
 	worldMatrix = XMMatrixTranslation(-groundPos.x, -groundPos.y, -groundPos.z);
 	
 	worldMatrix = XMMatrixTranslation(treePos1.x, treePos1.y, treePos1.z);
@@ -456,20 +456,20 @@ void App1::scndRender()
 
 	worldMatrix = XMMatrixTranslation(treePos1.x, treePos1.y, treePos1.z);
 	model[0]->sendData(renderer->getDeviceContext());
-	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), shadowMap->getDepthMapSRV(), skylight);
-	shadowShader->render(renderer->getDeviceContext(), model[0]->getIndexCount());
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), shadowMap->getDepthMapSRV(), pointlight, skylight, spotlight, showNorms);
+	lightShader->render(renderer->getDeviceContext(), model[0]->getIndexCount());
 	worldMatrix = XMMatrixTranslation(-treePos1.x, -treePos1.y, -treePos1.z);
 
 	worldMatrix = XMMatrixTranslation(treePos2.x, treePos2.y, treePos2.z);
 	model[1]->sendData(renderer->getDeviceContext());
-	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), shadowMap->getDepthMapSRV(), skylight);
-	shadowShader->render(renderer->getDeviceContext(), model[1]->getIndexCount());
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), shadowMap->getDepthMapSRV(), pointlight, skylight, spotlight, showNorms);
+	lightShader->render(renderer->getDeviceContext(), model[1]->getIndexCount());
 	worldMatrix = XMMatrixTranslation(-treePos2.x, -treePos2.y, -treePos2.z);
 
 	worldMatrix = XMMatrixTranslation(treePos3.x, treePos3.y, treePos3.z);
 	model[2]->sendData(renderer->getDeviceContext());
-	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), shadowMap->getDepthMapSRV(), skylight);
-	shadowShader->render(renderer->getDeviceContext(), model[2]->getIndexCount());
+	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), shadowMap->getDepthMapSRV(), pointlight, skylight, spotlight, showNorms);
+	lightShader->render(renderer->getDeviceContext(), model[2]->getIndexCount());
 	worldMatrix = XMMatrixTranslation(-treePos3.x, -treePos3.y, -treePos3.z);
 
 	XMMATRIX orthoMatrix = renderer->getOrthoMatrix();
@@ -558,8 +558,6 @@ void App1::finalPass()
 		renderer->setZBuffer(true);
 	}
 }
-
-
 
 void App1::gui()
 {
@@ -787,7 +785,7 @@ void App1::gui()
 		{
 			ImGui::SliderFloat("Tree3 x pos", &treePos3.x, -100.0f, 100.0f);
 			ImGui::SliderFloat("Tree3 y pos", &treePos3.y, -100.0f, 100.0f);
-			ImGui::SliderFloat("Tree3 z pos", &treePos3.z, 10.0f, 100.0f);
+			ImGui::SliderFloat("Tree3 z pos", &treePos3.z, 0.0f, 100.0f);
 		}		
 		
 		if (ImGui::CollapsingHeader("Ground Position"))

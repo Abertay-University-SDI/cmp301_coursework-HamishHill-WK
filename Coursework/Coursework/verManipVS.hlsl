@@ -1,4 +1,3 @@
-//vertex shader
 Texture2D texture0 : register(t0);
 SamplerState sampler0 : register(s0);
 
@@ -91,17 +90,11 @@ OutputType main(InputType input)
 	output.position = mul(input.position, worldMatrix);
 	output.position = mul(output.position, viewMatrix);
 	output.position = mul(output.position, projectionMatrix);
-
     
 	// Store the texture coordinates for the pixel shader.
 	output.tex = input.tex;
-
-	// Calculate the normal vector against the world matrix only and normalise.
-   // output.normal = mul(input.normal, (float3x3) worldMatrix);
 	
     output.normal = calcNormals(input.tex);
-    //output.normal = input.normal;
-   // output.normal = normalize(output.normal);
 	
     output.lightViewPos = mul(input.position, worldMatrix);
     output.lightViewPos = mul(output.lightViewPos, lightViewMatrix);

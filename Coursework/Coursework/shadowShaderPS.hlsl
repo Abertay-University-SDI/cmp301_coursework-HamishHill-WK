@@ -20,7 +20,7 @@ struct InputType
     float4 lightViewPos : TEXCOORD1;
 };
 
-// Calculate lighting intensity based on direction and normal. Combine with light colour.
+// Calculate lighting intensity based on direction and normal
 float4 calculateLighting(float3 lightDirection, float3 normal, float4 diffuse)
 {
     float intensity = saturate(dot(normal, lightDirection));
@@ -72,13 +72,12 @@ float4 main(InputType input) : SV_TARGET
 	// Calculate the projected texture coordinates.
     float2 pTexCoord = getProjectiveCoords(input.lightViewPos);
 	
-    // Shadow test. Is or isn't in shadow
+   //is the pixel in shadow
     if (hasDepthData(pTexCoord))
-    {
-        // Has depth map data
+    {   
+        //if not in shadow, apply lighting
         if (!isInShadow(depthMapTexture, pTexCoord, input.lightViewPos, shadowMapBias))
         {
-            // is NOT in shadow, therefore light
             colour = calculateLighting(-direction, input.normal, diffuse);
         }
     }

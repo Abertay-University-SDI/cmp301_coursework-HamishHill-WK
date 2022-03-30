@@ -1,4 +1,3 @@
-
 Texture2D texture0 : register(t0);
 SamplerState sampler0 : register(s0);
 
@@ -141,21 +140,14 @@ float4 main(InputType input) : SV_TARGET
     
     float4 finalDif = float4(0.f, 0.f, 0.f, 1.f);
     
+    //is the pixel in shadow
     if (hasDepthData(pTexCoord))
     {
-        // Has depth map data
+        //if not in shadow, apply lighting
         if (!isInShadow(depthMapTexture, pTexCoord, input.lightViewPos, shadowMapBias))
         {
-            // is NOT in shadow, therefore light
             finalDif = calculateLighting(-direction, input.normal, skyDiffuse);
-        }        
-            
-        //if (isInShadow(depthMapTexture, pTexCoord, input.lightViewPos, shadowMapBias))
-        //{
-        //    // is in shadow, therefore no light
-        //    finalDif = (0, 0, 0, 0);
-        //    return finalDif;
-        //}
+        }              
     }
     
     finalDif = finalDif + (calculateLighting(lightVector, input.normal, diffuse) * attenMod) + ambient + skyAmbient + spotAmbient;

@@ -1,10 +1,8 @@
-
-// Calculate diffuse lighting for a single directional light (also texturing)
-Texture2D depthTex : register(t1);
-SamplerState shadowSamp : register(s1);
-
 Texture2D texture0 : register(t0);
 SamplerState sampler0 : register(s0);
+
+Texture2D depthTex : register(t1);
+SamplerState shadowSamp : register(s1);
 
 cbuffer LightBuffer : register(b0)
 {
@@ -39,7 +37,6 @@ cbuffer spotLightBuffer : register(b1)
     float cone;
 };
 
-
 struct InputType
 {
     float4 position : SV_POSITION;
@@ -47,6 +44,7 @@ struct InputType
     float3 normal : NORMAL;
     float3 worldPosition : TEXCOORD1;
     float3 view : TEXCOORD2;
+    float4 lightViewPos : TEXCOORD3;
 };
 
 // Calculate lighting intensity based on direction and normal. Combine with light colour.
@@ -98,7 +96,6 @@ float4 calcSpecular(float3 lightD, float3 norm, float3 view, float4 specCol, flo
     return saturate(specCol * specInt);
 }
 
-
 float4 main(InputType input) : SV_TARGET
 { 
     if (norms == 1)
@@ -106,9 +103,9 @@ float4 main(InputType input) : SV_TARGET
         float4 colour = float4(input.normal.x, input.normal.y, input.normal.z, 1.0f);
         return normalize(colour);
     }
-        
+          
     float4 textureColour;
-    float4 lightColour;
+    float4 lightColour = float4(0, 0, 0, 0);
 
     float beta = cone / 3; //inner cone of spotlight
     float alpha; //angle between light vector and light direction 
@@ -134,15 +131,28 @@ float4 main(InputType input) : SV_TARGET
 
     alpha = acos(angleDot / (length(spotLightVector) * length(spotDirection))); //find angle between 2 vectors
     intensity = (cos(alpha) - cos(cone / 2)) / (cos(beta / 2) - cos(cone / 2));
-    
-    float4 finalDif;
+    	
+    float shadowMapBias = 0.01f;
+
+	// Calculate the projected texture coordinates.
+    float2 pTexCoord = getProjectiveCoords(input.lightViewPos);
 	
-            //calculate lighting for point light                                    //add directional light
-    finalDif = (calculateLighting(-lightVector, input.normal, diffuse) * attenMod) + (calculateLighting(-direction, input.normal, skyDiffuse) );
+   //is the pixel in shadow
+    if (hasDepthData(pTexCoord))
+    {
+        //if not in shadow, apply lighting
+        if (!isInShadow(depthTex, pTexCoord, input.lightViewPos, shadowMapBias))
+        {
+            lightColour = lightColour + calculateLighting(-direction, input.normal, skyDiffuse);
+        }
+    }
+            //calculate lighting for point light                               
+    lightColour = lightColour + (calculateLighting(-lightVector, input.normal, diffuse) * attenMod);
+                               //  +(calculateLighting(-direction, input.normal, skyDiffuse));
 	
     if (spotD >= range)
     {
-        lightColour = ambient + skyAmbient + spotAmbient + finalDif;
+        lightColour += ambient + skyAmbient + spotAmbient;
         return saturate(lightColour * textureColour);
     }
     else
@@ -150,14 +160,13 @@ float4 main(InputType input) : SV_TARGET
     
         attenMod = 1 / ((spotAtten.x + (spotAtten.y * spotD)) + (spotAtten.z * (spotD * spotD)));
 
-        finalDif = finalDif + calcSpecular(spotLightVector, input.normal, input.view, specDiffuse, specPower) +
+        lightColour = lightColour + calcSpecular(spotLightVector, input.normal, input.view, specDiffuse, specPower) +
         (calculateLighting(spotLightVector, input.normal, spotDiffuse) * attenMod * intensity);
     
-    
-        lightColour = ambient + skyAmbient + spotAmbient + finalDif;
-    
-        return saturate(lightColour * textureColour);
+        lightColour = lightColour + ambient + skyAmbient + spotAmbient;
     }
+    
+    return saturate(lightColour * textureColour);
 }
 
 

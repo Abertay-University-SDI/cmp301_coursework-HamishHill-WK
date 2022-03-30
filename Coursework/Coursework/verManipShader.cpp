@@ -194,14 +194,6 @@ void verManipShader::setShaderParameters(ID3D11DeviceContext* deviceContext, con
 	spotlightPtr->range = spotlight->getRange();
 	spotlightPtr->cone = spotlight->getCone();
 
-	//lightPtr->pad1[0] = 0.0f;
-	//lightPtr->pad1[1] = 0.0f;
-	//lightPtr->pad1[2] = 0.0f;
-
-
-	//->type[2] = pointlight->getType();
-
-
 	deviceContext->Unmap(lightBuffer, 0);
 	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);	
 	

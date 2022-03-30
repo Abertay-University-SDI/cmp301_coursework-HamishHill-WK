@@ -1,5 +1,3 @@
-// Colour shader.h
-// Simple shader example.
 #pragma once
 
 #include "DXF.h"
