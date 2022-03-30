@@ -34,10 +34,10 @@ protected:
 	XMFLOAT3 treePos3;	
 	XMFLOAT3 groundPos;	
 
-	XMFLOAT3 treePos1Def = XMFLOAT3(-30, 5, 30);
-	XMFLOAT3 treePos2Def = XMFLOAT3(-40, 5, 20);
-	XMFLOAT3 treePos3Def =XMFLOAT3(-20, 5, 10);	
-	XMFLOAT3 groundPosDef =XMFLOAT3(-115, 5, 10);
+	XMFLOAT3 treePos1Def = XMFLOAT3(-27, -11, 30);
+	XMFLOAT3 treePos2Def = XMFLOAT3(-44, -11, 38);
+	XMFLOAT3 treePos3Def =XMFLOAT3(-50, -10, 14);	
+	XMFLOAT3 groundPosDef =XMFLOAT3(-92, -20, -16);
 
 	//modifiable lighting values for imgui
 	//point light variables
@@ -75,10 +75,10 @@ protected:
 	XMFLOAT3 attenuDef = XMFLOAT3(0.5f, 0.25f, 0.0f);
 
 	//sky
-	XMFLOAT4 skydiffuseDef = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	XMFLOAT4 skydiffuseDef = XMFLOAT4(0.1f, 0.0f, 0.5f, 1.0f);
 	XMFLOAT4 skyAmbiDef = XMFLOAT4(0.0f, 0.0f, 0.1f, 0.1f);
-	XMFLOAT3 skyPosDef = XMFLOAT3(-5.0f, 40.0f, 0.0f);
-	XMFLOAT3 directionDef = XMFLOAT3(-1.0f, -0.7f, 0.8f);
+	XMFLOAT3 skyPosDef = XMFLOAT3(-10.0f, 15.0f, 30.0f);
+	XMFLOAT3 directionDef = XMFLOAT3(-0.85f, -0.5f, 0.0f);
 
 	//spot
 	XMFLOAT4 spotDiffuseDef = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);;
@@ -115,7 +115,8 @@ private:
 	AModel* model[4] = { 0,0,0,0 };
 
 	SphereMesh* pointLightSphere;
-	SphereMesh* spotLightSphere;
+	SphereMesh* spotLightSphere;	
+	SphereMesh* skyLightSphere;
 
 	myLight* skylight;
 	myLight* pointlight;

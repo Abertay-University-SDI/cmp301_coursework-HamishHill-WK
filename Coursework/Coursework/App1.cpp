@@ -26,7 +26,8 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	ground = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());	
 	shadowGround = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
 	pointLightSphere = new SphereMesh(renderer->getDevice(), renderer->getDeviceContext());
-	spotLightSphere = new SphereMesh(renderer->getDevice(), renderer->getDeviceContext());
+	spotLightSphere = new SphereMesh(renderer->getDevice(), renderer->getDeviceContext());	
+	skyLightSphere = new SphereMesh(renderer->getDevice(), renderer->getDeviceContext());
 
 	groundShader = new verManipShader(renderer->getDevice(), hwnd);
 	textureShader = new texShader(renderer->getDevice(), hwnd);
@@ -139,6 +140,12 @@ App1::~App1()
 	{
 		delete spotLightSphere;
 		spotLightSphere = 0;
+	}
+		
+	if (skyLightSphere)
+	{
+		delete skyLightSphere;
+		skyLightSphere = 0;
 	}
 
 	if (renderTexture)
@@ -336,22 +343,27 @@ void App1::firstRender()
 
 	if (renderSphere)
 	{
-		worldMatrix = XMMatrixTranslation(pointlight->getPosition().x, pointlight->getPosition().y, pointlight->getPosition().z);
+		worldMatrix = XMMatrixTranslation(pos.x, pos.y, pos.z);
 		pointLightSphere->sendData(renderer->getDeviceContext());
 		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight, skylight, spotlight, showNorms);
 		lightShader->render(renderer->getDeviceContext(), pointLightSphere->getIndexCount());		worldMatrix = XMMatrixTranslation(pointlight->getPosition().x, pointlight->getPosition().y, pointlight->getPosition().z);
-		worldMatrix = XMMatrixTranslation(-pointlight->getPosition().x, -pointlight->getPosition().y, -pointlight->getPosition().z);
+		worldMatrix = XMMatrixTranslation(-pos.x, -pos.y, -pos.z);
 
-		worldMatrix = XMMatrixTranslation(spotlight->getPosition().x, spotlight->getPosition().y, spotlight->getPosition().z);
+		worldMatrix = XMMatrixTranslation(spotPos.x, spotPos.y, spotPos.z);
 		spotLightSphere->sendData(renderer->getDeviceContext());
 		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight, skylight,spotlight, showNorms);
 		lightShader->render(renderer->getDeviceContext(), spotLightSphere->getIndexCount());
-		worldMatrix = XMMatrixTranslation(-spotlight->getPosition().x, -spotlight->getPosition().y, -spotlight->getPosition().z);
+		worldMatrix = XMMatrixTranslation(-spotPos.x, -spotPos.y, -spotPos.z);
+	
+		worldMatrix = XMMatrixTranslation(skyPos.x, skyPos.y, skyPos.z);
+		skyLightSphere->sendData(renderer->getDeviceContext());
+		lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"snowTexture"), pointlight, skylight, spotlight, showNorms);
+		lightShader->render(renderer->getDeviceContext(), skyLightSphere->getIndexCount());
+		worldMatrix = XMMatrixTranslation(-skyPos.x, -skyPos.y, -skyPos.z);
 	}
 
 	// Present the rendered scene to the screen.
 	renderer->setBackBufferRenderTarget();
-
 }
 
 void App1::depthRender()
@@ -437,7 +449,6 @@ void App1::scndRender()
 	renderer->setZBuffer(true);
 
 	renderer->setBackBufferRenderTarget();
-
 }
 
 void App1::horizontalEdge()
@@ -515,12 +526,6 @@ void App1::finalPass()
 		textureShader->render(renderer->getDeviceContext(), orthomesh->getIndexCount());
 		renderer->setZBuffer(true);
 	}
-
-	// Render GUI
-//	gui();
-
-	// Present the rendered scene to the screen.
-//	renderer->endScene();
 }
 
 
@@ -537,7 +542,6 @@ void App1::gui()
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);	
 	ImGui::Checkbox("Edge Detection ", &edgeEnabled);	
 	ImGui::Checkbox("Show displacement map normals ", &showNorms);
-
 
 	if (ImGui::Button("Reset to default values"))
 	{
@@ -592,7 +596,7 @@ void App1::gui()
 			ImGui::SliderFloat("Spot x direction", &spotDirection.x, -1.0f, 1.0f);
 			ImGui::SliderFloat("Spot y direction", &spotDirection.y, -1.0f, 1.0f);
 			ImGui::SliderFloat("Spot z direction", &spotDirection.z, -1.0f, 1.0f);
-			ImGui::SliderFloat("Spot Range", &spotRange, 0.0f, 200.0f);
+			ImGui::SliderFloat("Spot Range", &spotRange, 0.0f, 100.0f);
 			ImGui::SliderFloat("Spot Cone", &spotCone, 0.0f, 10.0f);
 		}
 
@@ -627,7 +631,7 @@ void App1::gui()
 			ImGui::SliderFloat("Spot Ambient Red_", &spotAmbi.w, 0.0f, 1.0f);
 			ImGui::SliderFloat("Spot Ambient Green_", &spotAmbi.x, 0.0f, 1.0f);
 			ImGui::SliderFloat("Spot Ambient Blue_", &spotAmbi.y, 0.0f, 1.0f);
-			ImGui::SliderFloat("Spot Ambient Alpha_", &spotAmbi.z, 0.0f, 1.0f);
+			//ImGui::SliderFloat("Spot Ambient Alpha_", &spotAmbi.z, 0.0f, 1.0f);
 		}
 
 		ImGui::Indent(-10);
@@ -664,7 +668,7 @@ void App1::gui()
 			ImGui::SliderFloat("Point Ambient Red", &ambi.w, 0.0f, 1.0f);
 			ImGui::SliderFloat("Point Ambient Green", &ambi.x, 0.0f, 1.0f);
 			ImGui::SliderFloat("Point Ambient Blue", &ambi.y, 0.0f, 1.0f);
-			ImGui::SliderFloat("Point Ambient Alpha", &ambi.z, 0.0f, 1.0f);
+			//ImGui::SliderFloat("Point Ambient Alpha", &ambi.z, 0.0f, 1.0f);
 		}
 	
 		ImGui::Indent(-10);
@@ -700,7 +704,7 @@ void App1::gui()
 			ImGui::SliderFloat("Sky Ambient Red ", &skyAmbi.w, 0.0f, 1.0f);
 			ImGui::SliderFloat("Sky Ambient Green ", &skyAmbi.x, 0.0f, 1.0f);
 			ImGui::SliderFloat("Sky Ambient Blue ", &skyAmbi.y, 0.0f, 1.0f);
-			ImGui::SliderFloat("Sky Ambient Alpha ", &skyAmbi.z, 0.0f, 1.0f);
+			//ImGui::SliderFloat("Sky Ambient Alpha ", &skyAmbi.z, 0.0f, 1.0f);
 		}
 		ImGui::Indent(-10);
 	}
@@ -726,7 +730,7 @@ void App1::gui()
 		{
 			ImGui::SliderFloat("Tree3 x pos", &treePos3.x, -100.0f, 100.0f);
 			ImGui::SliderFloat("Tree3 y pos", &treePos3.y, -100.0f, 100.0f);
-			ImGui::SliderFloat("Tree3 z pos", &treePos3.z, -100.0f, 100.0f);
+			ImGui::SliderFloat("Tree3 z pos", &treePos3.z, 10.0f, 100.0f);
 		}		
 		
 		if (ImGui::CollapsingHeader("Ground Position"))
