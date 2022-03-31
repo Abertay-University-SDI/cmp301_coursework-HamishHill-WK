@@ -15,7 +15,6 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	// Initalise scene variables.
 	textureMgr->loadTexture(L"brick", L"res/brick1.dds");
 	textureMgr->loadTexture(L"myHeightMap", L"res/myHeightMap.png");	
-	textureMgr->loadTexture(L"height", L"res/height.png");
 	textureMgr->loadTexture(L"snowTexture", L"res/snowTexture.png");
 	textureMgr->loadTexture(L"treeTex2", L"res/treeTex2.png");
 
@@ -664,7 +663,7 @@ void App1::gui()
 			ImGui::SliderFloat("Spot Attenuation z", &spotAttenu.z, 0.0f, 1.0f);
 		}
 
-		if (ImGui::CollapsingHeader("Diffuse Colour_"))
+		if (ImGui::CollapsingHeader("SpotDiffuse Colour_"))
 		{
 
 			ImGui::SliderFloat("Spot Red ", &spotDiffuse.x, 0.0f, 1.0f);
@@ -683,12 +682,12 @@ void App1::gui()
 			ImGui::SliderFloat("Specular Power", &specularPower, 0.0f, 1.0f);
 		}
 
-		if (ImGui::CollapsingHeader("Ambient Colour_"))
+		if (ImGui::CollapsingHeader("Spot Ambient Colour_"))
 		{
 			ImGui::SliderFloat("Spot Ambient Red_", &spotAmbi.x, 0.0f, 1.0f);
 			ImGui::SliderFloat("Spot Ambient Green_", &spotAmbi.y, 0.0f, 1.0f);
-			ImGui::SliderFloat("Spot Ambient Blue_", &spotAmbi.y, 0.0f, 1.0f);
-			ImGui::SliderFloat("Spot Ambient Alpha_", &spotAmbi.z, 0.0f, 1.0f);
+			ImGui::SliderFloat("Spot Ambient Blue_", &spotAmbi.z, 0.0f, 1.0f);
+			ImGui::SliderFloat("Spot Ambient Alpha_", &spotAmbi.w, 0.0f, 1.0f);
 		}
 
 		ImGui::Indent(-10);
@@ -787,7 +786,21 @@ void App1::gui()
 		{
 			ImGui::SliderFloat("Tree3 x pos", &treePos3.x, -100.0f, 100.0f);
 			ImGui::SliderFloat("Tree3 y pos", &treePos3.y, -100.0f, 100.0f);
-			ImGui::SliderFloat("Tree3 z pos", &treePos3.z, 0.0f, 100.0f);
+			ImGui::SliderFloat("Tree3 z pos", &treePos3.z, -100.0f, 100.0f);
+		}			
+		
+		if (ImGui::CollapsingHeader("Tree 4 Position"))
+		{
+			ImGui::SliderFloat("Tree4 x pos", &treePos4.x, -100.0f, 100.0f);
+			ImGui::SliderFloat("Tree4 y pos", &treePos4.y, -100.0f, 100.0f);
+			ImGui::SliderFloat("Tree4 z pos", &treePos4.z, -100.0f, 100.0f);
+		}			
+		
+		if (ImGui::CollapsingHeader("Tree 5 Position"))
+		{
+			ImGui::SliderFloat("Tree5 x pos", &treePos5.x, -100.0f, 100.0f);
+			ImGui::SliderFloat("Tree5 y pos", &treePos5.y, -100.0f, 100.0f);
+			ImGui::SliderFloat("Tree5 z pos", &treePos5.z, -100.0f, 100.0f);
 		}		
 		
 		if (ImGui::CollapsingHeader("Ground Position"))
