@@ -9,9 +9,9 @@
 #include "texShader.h"
 #include "LightShader.h"
 #include "DepthShader.h"
-#include "ShadowShader.h"
+//#include "ShadowShader.h"
 #include "verEdgeShader.h"
-#include "horEdgeShader.h"
+//#include "horEdgeShader.h"
 #include "verManipDepthShader.h"
 
 #include "myLight.h"
@@ -31,13 +31,18 @@ protected:
 	void gui();
 
 	XMFLOAT3 treePos1 = XMFLOAT3(0, 0, 0);
-	XMFLOAT3 treePos2;
-	XMFLOAT3 treePos3;	
-	XMFLOAT3 groundPos;	
+	XMFLOAT3 treePos2 = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 treePos3 = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 treePos4 = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 treePos5 = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 groundPos = XMFLOAT3(0, 0, 0);
 
 	XMFLOAT3 treePos1Def = XMFLOAT3(-27, -11, 30);
 	XMFLOAT3 treePos2Def = XMFLOAT3(-44, -11, 38);
-	XMFLOAT3 treePos3Def =XMFLOAT3(-50, -10, 14);	
+	XMFLOAT3 treePos3Def =XMFLOAT3(-50, -10, 24);		
+	XMFLOAT3 treePos4Def =XMFLOAT3(-60, -10, 14);	
+	XMFLOAT3 treePos5Def =XMFLOAT3(-40, -10, 30);	
+
 	XMFLOAT3 groundPosDef =XMFLOAT3(-92, -20, -16);
 
 	//modifiable lighting values for imgui
@@ -92,15 +97,11 @@ protected:
 	float spotRangeDef = 100.0f;
 	float spotConeDef = 1.0f;
 
+	//render functions
 	void wireFrameRender();
-
 	void depthRender();
 	void firstRender();
-	void scndRender();
-
 	void verticalEdge();
-	void horizontalEdge();
-
 	void finalPass();
 
 private:
@@ -108,14 +109,11 @@ private:
 	texShader* textureShader = 0;
 	LightShader* lightShader = 0;
 	DepthShader* depthShader = 0;
-	ShadowShader* shadowShader =0;
 	verEdgeShader* verEdgeShader1 =0;
-	horEdgeShader* horEdgeShader1 =0;
 	verManipDepthShader* verManipDepthShader1 = 0;
 
 	PlaneMesh* ground = 0;
-	PlaneMesh* shadowGround =0 ;
-	AModel* model[4] = { 0,0,0,0 };
+	AModel* model[5] = { 0, 0, 0, 0, 0};
 
 	SphereMesh* pointLightSphere = 0;
 	SphereMesh* spotLightSphere = 0;	
@@ -127,7 +125,6 @@ private:
 
 	OrthoMesh* orthomesh = 0;
 	RenderTexture* renderTexture = 0;
-	RenderTexture* horizEdgeTexture = 0;
 	RenderTexture* vertEdgeTexture = 0;
 
 	ShadowMap* shadowMap = 0;

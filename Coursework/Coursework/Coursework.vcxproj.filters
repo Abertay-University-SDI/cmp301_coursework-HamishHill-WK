@@ -36,13 +36,7 @@
     <ClCompile Include="DepthShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShadowShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="verEdgeShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="horEdgeShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="verManipDepthShader.cpp">
@@ -68,13 +62,7 @@
     <ClInclude Include="DepthShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShadowShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="verEdgeShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="horEdgeShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="verManipDepthShader.h">
@@ -106,22 +94,10 @@
     <FxCompile Include="depthShaderPS.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
-    <FxCompile Include="shadowShaderPS.hlsl">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
-    <FxCompile Include="shadowShaderVS.hlsl">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
     <FxCompile Include="verEdgeShaderVS.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
     <FxCompile Include="verEdgeShaderPS.hlsl">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
-    <FxCompile Include="horEdgeShaderVS.hlsl">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
-    <FxCompile Include="horEdgeShaderPS.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
     <FxCompile Include="verManipDepthVS.hlsl">
