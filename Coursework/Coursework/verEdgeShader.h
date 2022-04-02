@@ -1,6 +1,3 @@
-// Vertical blur shader handler
-// Loads vertical blur shaders (vs and ps)
-// Passes screen height to shaders, for sample coordinate calculation
 #pragma once
 
 #include "DXF.h"

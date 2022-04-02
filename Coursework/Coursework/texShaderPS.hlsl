@@ -1,4 +1,3 @@
-// Texture and sampler registers
 Texture2D texture0 : register(t0);
 SamplerState Sampler0 : register(s0);
 

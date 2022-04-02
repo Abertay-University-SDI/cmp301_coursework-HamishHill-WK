@@ -14,6 +14,12 @@ verManipDepthShader::~verManipDepthShader()
 		matrixBuffer = 0;
 	}
 
+	if (sampleState)
+	{
+		sampleState->Release();
+		sampleState = 0;
+	}
+	
 	// Release the layout.
 	if (layout)
 	{

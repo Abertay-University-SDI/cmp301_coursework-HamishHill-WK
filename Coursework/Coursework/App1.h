@@ -9,11 +9,8 @@
 #include "texShader.h"
 #include "LightShader.h"
 #include "DepthShader.h"
-//#include "ShadowShader.h"
 #include "verEdgeShader.h"
-//#include "horEdgeShader.h"
 #include "verManipDepthShader.h"
-
 #include "myLight.h"
 
 class App1 : public BaseApplication

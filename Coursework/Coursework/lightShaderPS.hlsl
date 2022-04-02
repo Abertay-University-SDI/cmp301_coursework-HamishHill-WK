@@ -47,7 +47,7 @@ struct InputType
     float4 lightViewPos : TEXCOORD3;
 };
 
-// Calculate lighting intensity based on direction and normal. Combine with light colour.
+// Calculate lighting intensity based on direction and normal. Combine with light colour
 float4 calculateLighting(float3 lightDirection, float3 normal, float4 diffuse)
 {
     float intensity = saturate(dot(normal, lightDirection));
@@ -55,7 +55,7 @@ float4 calculateLighting(float3 lightDirection, float3 normal, float4 diffuse)
     return colour;
 }
 
-bool hasDepthData(float2 uv)
+bool depthData(float2 uv)
 {
     if (uv.x < 0.f || uv.x > 1.f || uv.y < 0.f || uv.y > 1.f)
     {
@@ -64,25 +64,21 @@ bool hasDepthData(float2 uv)
     return true;
 }
 
-bool isInShadow(Texture2D sMap, float2 uv, float4 lightViewPosition, float bias)
+bool inShadow(Texture2D map, float2 uv, float4 lightViewPosition, float bias)
 {
-    // Sample the shadow map (get depth of geometry)
-    float depthValue = sMap.Sample(shadowSamp, uv).r;
-	// Calculate the depth from the light.
+    float dValue = map.Sample(shadowSamp, uv).r;
     float lightDepthValue = lightViewPosition.z / lightViewPosition.w;
     lightDepthValue -= bias;
 
-	// Compare the depth of the shadow map value and the depth of the light to determine whether to shadow or to light this pixel.
-    if (lightDepthValue < depthValue)
+    if (lightDepthValue < dValue)
     {
         return false;
     }
     return true;
 }
 
-float2 getProjectiveCoords(float4 lightViewPosition)
+float2 projCoords(float4 lightViewPosition)
 {
-    // Calculate the projected texture coordinates.
     float2 projTex = lightViewPosition.xy / lightViewPosition.w;
     projTex *= float2(0.5, -0.5);
     projTex += float2(0.5f, 0.5f);
@@ -135,29 +131,27 @@ float4 main(InputType input) : SV_TARGET
     float shadowMapBias = 0.01f;
 
 	// Calculate the projected texture coordinates.
-    float2 pTexCoord = getProjectiveCoords(input.lightViewPos);
+    float2 texCoord = projCoords(input.lightViewPos);
 	
    //is the pixel in shadow
-    if (hasDepthData(pTexCoord))
+    if (depthData(texCoord))
     {
         //if not in shadow, apply lighting
-        if (!isInShadow(depthTex, pTexCoord, input.lightViewPos, shadowMapBias))
+        if (!inShadow(depthTex, texCoord, input.lightViewPos, shadowMapBias))
         {
             lightColour = lightColour + calculateLighting(-direction, input.normal, skyDiffuse);
         }
     }
             //calculate lighting for point light                               
     lightColour = lightColour + (calculateLighting(-lightVector, input.normal, diffuse) * attenMod);
-                               //  +(calculateLighting(-direction, input.normal, skyDiffuse));
 	
-    if (spotD >= range)
-    {
+    if (spotD >= range) //if pixel is out of range of spot light
+    {   //add ambient colours and return
         lightColour += ambient + skyAmbient + spotAmbient;
         return saturate(lightColour * textureColour);
     }
-    else
-    {
-    
+    else //if pixel is in range of spotlight
+    {   //calculate and add spotlight colour
         attenMod = 1 / ((spotAtten.x + (spotAtten.y * spotD)) + (spotAtten.z * (spotD * spotD)));
 
         lightColour = lightColour + calcSpecular(spotLightVector, input.normal, input.view, specDiffuse, specPower) +

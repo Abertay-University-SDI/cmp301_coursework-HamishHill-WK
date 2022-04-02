@@ -1,6 +1,3 @@
-// texture vertex shader
-// Basic shader for rendering textured geometry
-
 cbuffer MatrixBuffer : register(b0)
 {
     matrix worldMatrix;

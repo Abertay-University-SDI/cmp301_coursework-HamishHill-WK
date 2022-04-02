@@ -15,6 +15,18 @@ verManipShader::~verManipShader()
 		sampleState = 0;
 	}
 
+	if (sampleState1)
+	{
+		sampleState1->Release();
+		sampleState1 = 0;
+	}
+
+	if (sampleStateShadow)
+	{
+		sampleStateShadow->Release();
+		sampleStateShadow = 0;
+	}
+
 	// Release the matrix constant buffer.
 	if (matrixBuffer)
 	{

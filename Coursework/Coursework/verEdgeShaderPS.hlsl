@@ -32,24 +32,23 @@ float4 main(InputType input) : SV_TARGET
     colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * 0.f)) * weight;
     colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * -1.f)) * weight;
     colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * 2.0f)) * weight;
-    colour += shaderTexture.Sample(SampleType, input.tex) * 8;// * weight;
+    colour += shaderTexture.Sample(SampleType, input.tex) * 8;
     colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * -2.f)) * weight;
     colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * 1.f)) * weight;
     colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * 0.f)) * weight;
     colour += shaderTexture.Sample(SampleType, input.tex + float2(0.0f, texelSize * -1.f)) * weight;
  
-    //horizontal pixels
+    // Add the horizontal pixels to the colour by the specific weight of each.
     colour1 += shaderTexture.Sample(SampleType, input.tex + float2(texelSize1 * 1.f, 0.0f)) * weight;
     colour1 += shaderTexture.Sample(SampleType, input.tex + float2(texelSize1 * 2.f, 0.0f)) * weight;
     colour1 += shaderTexture.Sample(SampleType, input.tex + float2(texelSize1 * 1.0f, 0.0f)) * weight;
     colour1 += shaderTexture.Sample(SampleType, input.tex + float2(texelSize1 * 0.0f, 0.0f)) * weight;
-    colour1 += shaderTexture.Sample(SampleType, input.tex) * 8; //* weight;
+    colour1 += shaderTexture.Sample(SampleType, input.tex) * 8; 
     colour1 += shaderTexture.Sample(SampleType, input.tex + float2(texelSize1 * 0.0f, 0.0f)) * weight;
     colour1 += shaderTexture.Sample(SampleType, input.tex + float2(texelSize1 * -1.f, 0.0f)) * weight;
     colour1 += shaderTexture.Sample(SampleType, input.tex + float2(texelSize1 * -2.f, 0.0f)) * weight;
     colour1 += shaderTexture.Sample(SampleType, input.tex + float2(texelSize1 * -1.f, 0.0f)) * weight;
 	// Set the alpha channel to one.
-    // Set the alpha channel to one.
     colour.a = 1.0f;
     colour1.a - 1.f;
     

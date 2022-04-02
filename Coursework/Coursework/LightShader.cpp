@@ -36,6 +36,17 @@ LightShader::~LightShader()
 		lightBuffer = 0;
 	}
 
+	if (spotlightBuffer)
+	{
+		spotlightBuffer->Release();
+		spotlightBuffer = 0;
+	}
+
+	if (sampleStateShadow)
+	{
+		sampleStateShadow->Release();
+		sampleStateShadow = 0;
+	}
 	//Release base shader components
 	BaseShader::~BaseShader();
 }
@@ -89,7 +100,6 @@ void LightShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilenam
 
 	// Setup light buffer
 	// Setup the description of the light dynamic constant buffer that is in the pixel shader.
-	// Note that ByteWidth always needs to be a multiple of 16 if using D3D11_BIND_CONSTANT_BUFFER or CreateBuffer will fail.
 	lightBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	lightBufferDesc.ByteWidth = sizeof(LightBufferType);
 	lightBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -105,8 +115,6 @@ void LightShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilenam
 	lightBufferDesc.MiscFlags = 0;
 	lightBufferDesc.StructureByteStride = 0;
 	renderer->CreateBuffer(&lightBufferDesc, NULL, &spotlightBuffer);
-
-
 }
 
 

@@ -1,10 +1,7 @@
-// Lab1.cpp
-// Lab 1 example, simple coloured triangle mesh
 #include "App1.h"
 
 App1::App1()
 {
-
 }
 
 void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight, Input *in, bool VSYNC, bool FULL_SCREEN)
@@ -253,6 +250,7 @@ bool App1::frame()
 
 bool App1::render()
 {
+	//set lighting variables to modifiable variables
 	pointlight->setPosition(pos.x, pos.y, pos.z);
 	pointlight->setDiffuseColour(pointdiffuse.x, pointdiffuse.y, pointdiffuse.z, pointdiffuse.w);
 	pointlight->setAmbientColour(ambi.x, ambi.y, ambi.z, ambi.w);
@@ -297,6 +295,9 @@ bool App1::render()
 	return true;
 }
 
+//render models in scene for wireframe conversion
+//this is done in a seperate render function as normal scene render goes to a render texture. 
+//wireframe mode does not show full scene when used on a rendertexture.
 void App1::wireFrameRender()
 {
 	XMMATRIX worldMatrix = renderer->getWorldMatrix();
@@ -361,6 +362,7 @@ void App1::wireFrameRender()
 	}
 }
 
+//objects are first passed through depth shader to generate shadow map
 void App1::depthRender()
 {
 	shadowMap->BindDsvAndSetNullRenderTarget(renderer->getDeviceContext());
@@ -371,6 +373,8 @@ void App1::depthRender()
 	XMMATRIX lightProjectionMatrix = skylight->getOrthoMatrix();
 	XMMATRIX worldMatrix = renderer->getWorldMatrix();
 
+	//vertex manipulated geometry requires its own depth shader which passes in the height map which will be applied to it.
+	//this is done so that the ground object is not rendered as a flat plane on the shadow map.
 	worldMatrix = XMMatrixTranslation(groundPos.x, groundPos.y, groundPos.z);
 	ground->sendData(renderer->getDeviceContext());
 	verManipDepthShader1->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix, textureMgr->getTexture(L"myHeightMap"));
@@ -420,12 +424,14 @@ void App1::firstRender()
 	XMMATRIX viewMatrix = camera->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
+	//ground shader applies vertex manipulation, texturing, lighting and shadows to object.
 	worldMatrix = XMMatrixTranslation(groundPos.x, groundPos.y, groundPos.z);
 	ground->sendData(renderer->getDeviceContext());
 	groundShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"myHeightMap"), textureMgr->getTexture(L"snowTexture"), shadowMap->getDepthMapSRV(), skylight, pointlight, spotlight ,showNorms);
 	groundShader->render(renderer->getDeviceContext(), ground->getIndexCount());
 	worldMatrix = XMMatrixTranslation(-groundPos.x, -groundPos.y, -groundPos.z);
 
+	//light shader applies lighting, texturing and shadows to objects.
 	worldMatrix = XMMatrixTranslation(treePos1.x, treePos1.y, treePos1.z);
 	model[0]->sendData(renderer->getDeviceContext());
 	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"treeTex2"), shadowMap->getDepthMapSRV(), pointlight, skylight, spotlight, showNorms);
@@ -456,7 +462,7 @@ void App1::firstRender()
 	lightShader->render(renderer->getDeviceContext(), model[4]->getIndexCount());
 	worldMatrix = XMMatrixTranslation(-treePos5.x, -treePos5.y, -treePos5.z);
 
-	if (renderSphere)
+	if (renderSphere)	//if the render spehere option is turned on in the imGui() then sphere objects will be rendered at the location of light sources in the scene.
 	{
 		worldMatrix = XMMatrixTranslation(pos.x, pos.y, pos.z);
 		pointLightSphere->sendData(renderer->getDeviceContext());
@@ -481,7 +487,8 @@ void App1::firstRender()
 	XMMATRIX orthoViewMatrix = camera->getOrthoViewMatrix();
 
 	orthomesh->sendData(renderer->getDeviceContext());
-
+	
+	//the scene is then added to this orthomesh for post processing. 
 	textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, shadowMap->getDepthMapSRV());
 	textureShader->render(renderer->getDeviceContext(), orthomesh->getIndexCount());
 
@@ -492,6 +499,7 @@ void App1::firstRender()
 
 void App1::verticalEdge()
 {
+	//this pass applies edge detection to the full scene. 
 	XMMATRIX worldMatrix, baseViewMatrix, orthoMatrix;
 
 	float screenSizeY = (float)vertEdgeTexture->getTextureHeight();
@@ -517,14 +525,12 @@ void App1::verticalEdge()
 
 void App1::finalPass()
 {
-	// RENDER THE RENDER TEXTURE SCENE
-	// Requires 2D rendering and an ortho mesh.
 	renderer->setZBuffer(false);
 	XMMATRIX worldMatrix = renderer->getWorldMatrix();
 	XMMATRIX orthoMatrix = renderer->getOrthoMatrix();  // ortho matrix for 2D rendering
 	XMMATRIX orthoViewMatrix = camera->getOrthoViewMatrix();	// Default camera position for orthographic rendering
 
-	if (edgeEnabled)
+	if (edgeEnabled)	//if edge detection is enabled, render the scene with edge detection applied to it.
 	{
 		orthomesh->sendData(renderer->getDeviceContext());
 		textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, vertEdgeTexture->getShaderResourceView());
@@ -532,7 +538,7 @@ void App1::finalPass()
 		renderer->setZBuffer(true);
 	}
 
-	if (!edgeEnabled)
+	if (!edgeEnabled)	//if edge detection is not enabled, render the scene before edge detection was applied.
 	{
 		orthomesh->sendData(renderer->getDeviceContext());
 		textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, renderTexture->getShaderResourceView());
@@ -555,7 +561,7 @@ void App1::gui()
 	ImGui::Checkbox("Show displacement map normals ", &showNorms);
 	ImGui::Checkbox("Show Light Sources", &renderSphere);
 
-	if (ImGui::Button("Reset to default values"))
+	if (ImGui::Button("Reset to default values"))	//resets all variables to their default setting. Default settings are decalred in "App1.h"
 	{
 		//point light variables
 		pos = posDef;
@@ -593,7 +599,7 @@ void App1::gui()
 		showNorms = false;
 	}
 
-	if (ImGui::CollapsingHeader("Hide Lights"))
+	if (ImGui::CollapsingHeader("Hide Lights"))	//buttons to hide indiviual lights by setting diffuse + ambient values to (0, 0, 0, 0).
 	{
 		ImGui::Indent(10);
 		if (ImGui::Button("Hide point light"))
