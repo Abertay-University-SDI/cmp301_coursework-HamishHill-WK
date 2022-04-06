@@ -75,7 +75,7 @@ protected:
 	//Default point light
 	XMFLOAT3 posDef = XMFLOAT3(-40.0f, -5.0f, 24.0f);
 	XMFLOAT4 pointdiffuseDef = XMFLOAT4(1.0f, 0.4f, 0.4f, 1.0f);
-	XMFLOAT4 ambiDef = XMFLOAT4(0.07f, 0.07f, 0.0f, 0.1f);;
+	XMFLOAT4 ambiDef = XMFLOAT4(0.07f, 0.07f, 0.0f, 0.1f);
 	XMFLOAT3 attenuDef = XMFLOAT3(0.0f, 0.022f, 0.005f);
 
 	//Default sky light
@@ -85,8 +85,8 @@ protected:
 	XMFLOAT3 directionDef = XMFLOAT3(-0.85f, -0.5f, 0.0f);
 
 	//Default spot light
-	XMFLOAT4 spotDiffuseDef = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);;
-	XMFLOAT3 spotAttenuDef = XMFLOAT3(0.06f, 0.016f, 0.0f);;
+	XMFLOAT4 spotDiffuseDef = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+	XMFLOAT3 spotAttenuDef = XMFLOAT3(0.06f, 0.016f, 0.0f);
 	XMFLOAT3 spotPosDef = XMFLOAT3(-76.0f, 0.0f, 35.0f);
 	XMFLOAT3 spotDirectionDef = XMFLOAT3(0.0f, 0.5f, 0.9f);
 	XMFLOAT4 spotAmbiDef = XMFLOAT4(0.05f, 0.05f, 0.0f, 0.1f);

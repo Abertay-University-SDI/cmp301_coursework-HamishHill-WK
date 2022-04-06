@@ -92,6 +92,13 @@ float4 calcSpecular(float3 lightD, float3 norm, float3 view, float4 specCol, flo
     return saturate(specCol * specInt);
 }
 
+float4 calcSpecular1(float3 lightD, float3 norm, float3 view1, float4 specCol, float specPowr)
+{
+    float3 reflect1 = reflect(-lightD, norm);
+    float specInt = pow(max(dot(view1, reflect1), 0.0f), specPowr);
+    return saturate(specCol * specInt);
+}
+
 float4 main(InputType input) : SV_TARGET
 { 
     if (norms == 1)
@@ -148,6 +155,11 @@ float4 main(InputType input) : SV_TARGET
     if (spotD >= range) //if pixel is out of range of spot light
     {   //add ambient colours and return
         lightColour += ambient + skyAmbient + spotAmbient;
+        attenMod = 1 / ((spotAtten.x + (spotAtten.y * spotD)) + (spotAtten.z * (spotD * spotD)));
+
+        lightColour = lightColour + calcSpecular1(spotLightVector, input.normal, input.view, specDiffuse, (specPower / 2)) +
+        (calculateLighting(spotLightVector, input.normal, spotDiffuse) * attenMod * intensity);
+        return lightColour * textureColour;
         return saturate(lightColour * textureColour);
     }
     else //if pixel is in range of spotlight
